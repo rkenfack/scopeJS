@@ -1,0 +1,34 @@
+{
+  "jspm": {
+    "directories": {},
+    "dependencies": {
+      "clean-css": "npm:clean-css@^3.3.5"
+    },
+    "devDependencies": {
+      "babel": "npm:babel-core@^5.1.13",
+      "babel-runtime": "npm:babel-runtime@^5.1.13",
+      "chai": "npm:chai@^3.0.0",
+      "core-js": "npm:core-js@^0.9.4",
+      "mocha": "npm:mocha@^2.2.5"
+    }
+  },
+  "name": "scope",
+  "version": "0.0.0",
+  "main": "scope.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "grunt": "~0.4.5"
+  },
+  "devDependencies": {
+    "grunt-shell": "^1.1.2",
+    "grunt-contrib-jshint": "^0.11.2",
+    "grunt-contrib-clean": "^0.6.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Romeo Kenfack Tsakem",
+  "license": "ISC"
+}

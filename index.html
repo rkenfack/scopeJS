@@ -1,0 +1,118 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+
+  <script src="jspm_packages/system.js"></script>
+  <script src="config.js"></script>
+
+  <script src="dist/scope.js"></script>
+  <script type="text/javascript">
+
+
+    var startUp = function() {
+
+     // scope(".moveable").insertAfter(scope("#target2 li").eq(0));
+
+      var target = $("#target").setStyles({
+        width: "500px",
+        height: "500px",
+        backgroundColor: "green"
+      });
+
+      target.on("click", function(e) {
+        console.log(e);
+      });
+
+
+      target.emit("click")
+
+
+      var model = {
+        name : "Jon Doe",
+        age : 33,
+        active : false,
+        handleClick : function(e) {
+          console.log(e)
+        },
+        changeActiveState : function(e) {
+          model.active = scope("#active")[0].checked;
+        }
+      };
+
+      scope("#target").template(model);
+
+      model.name = "Romeo Kenfack Tsakem";
+      model.age = 34;
+
+      var router = new scope.Router().init("/");
+
+      var allroutes = function(param) {
+        param = param || "";
+        console.log(router.getRoute(), param);
+      };
+
+      window.setTimeout(function() {
+        model.name = "Carine Sandrine Nguiko";
+        model.age = 29;
+      }, 3000);
+
+      /*router.configure({
+        on : allroutes
+      });*/
+
+      router.on("/", allroutes);
+      router.on("/author", allroutes);
+      router.on("/books", allroutes);
+      router.on("/books/view/:bookId", allroutes);
+
+      /*scope("#active").on("click", function(e) {
+       console.log(model.active)
+      });*/
+
+      target.on("click", function(e) {
+        console.log(e);
+      });
+
+      //var clone = target.clone(false).insertAfter(target);
+
+    };
+
+
+    if (typeof scope != "undefined") {
+      scope.ready(startUp);
+    } else {
+      System.import('src/App').then(function() {
+        scope.ready(startUp);
+      });
+    }
+
+
+
+  </script>
+
+
+
+</head>
+
+<body>
+
+  <div id="testEL" class="testClass">
+    <ul>
+      <li><a href="#/author">#/author</a></li>
+      <li><a href="#/books">#/books</a></li>
+      <li><a href="#/books/view/1">#/books/view/1</a></li>
+       <li><a href="#/nonExistingRoute">#/nonExistingRoute</a></li>
+    </ul>
+  </div>
+
+  <div class="target" id="target">
+    <p>My name is
+      <div>{{name}}</div>and my age is {{age}}.</p>
+      <input id="active" type="checkbox" data-checked="{{active}}" data-change="changeActiveState()" />
+  </div>
+
+
+</body>
+
+</html>
