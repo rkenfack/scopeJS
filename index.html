@@ -6,7 +6,7 @@
   <script src="jspm_packages/system.js"></script>
   <script src="config.js"></script>
 
-  <script src="dist/scope.js"></script>
+  <script src="dist/scospe.js"></script>
   <script type="text/javascript">
 
 
@@ -20,12 +20,13 @@
         backgroundColor: "green"
       });
 
-      target.on("click", function(e) {
+
+      scope("#active").on("keyup", function(e) {
         console.log(e);
       });
 
 
-      target.emit("click")
+     scope("#active").emitNative("keyup", {"char" : "a"});
 
 
       var model = {
@@ -70,9 +71,7 @@
        console.log(model.active)
       });*/
 
-      target.on("click", function(e) {
-        console.log(e);
-      });
+
 
       //var clone = target.clone(false).insertAfter(target);
 
@@ -99,7 +98,7 @@
 
   <div id="testEL" class="testClass">
     <ul>
-      <li><a href="#/author">#/author</a></li>
+      <li  ><a href="#/author">#/author</a></li>
       <li><a href="#/books">#/books</a></li>
       <li><a href="#/books/view/1">#/books/view/1</a></li>
        <li><a href="#/nonExistingRoute">#/nonExistingRoute</a></li>
@@ -107,9 +106,10 @@
   </div>
 
   <div class="target" id="target">
-    <p>My name is
-      <div>{{name}}</div>and my age is {{age}}.</p>
-      <input id="active" type="checkbox" data-checked="{{active}}" data-change="changeActiveState()" />
+    <p> My name is {{name}} </p>
+     <p> and my age is {{age}}.</p>
+      <input  type="checkbox" data-checked="{{active}}" data-change="changeActiveState()" />
+      <input id="active" type="text" />
   </div>
 
 

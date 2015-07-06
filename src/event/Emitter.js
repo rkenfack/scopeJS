@@ -3,33 +3,30 @@ import cssHelpers from "src/css/Helpers";
 import Logger from "src/modules/Logger";
 import utils from "src/utils/Utils";
 
-export
-default (function () {
-  //item.dispatchEvent(new CustomEvent(eventName ,{ detail : data }));
-  //http://www.w3.org/TR/pointerevents/#pointerevent-interface
-  /*var event = new PointerEvent("pointerover",
-   {bubbles: true,
-    cancelable: true,
-    pointerId: 42,
-    pointerType: "pen",
-    clientX: 300,
-    clientY: 500
-    });
-eventTarget.dispatchEvent(event); */
 
 
-//https://gist.github.com/basecss/8666646
+export default (function () {
+
+  var keyEventSpec = "keyboard";
+
+  (function(){
+    var evt = document.createEvent('KeyboardEvent');
+    keyEventSpec = evt.initKeyEvent ? "key" : "keyboard";
+  })();
+
 
 
   var eventProperties = {
 
-    base: {
-      bubbles: true,
-      cancelable: true
+    base : {
+      canBubble: true,
+      cancelable: true,
+      view: window,
+      detail: 0,
     },
 
     mouse : {
-      canBubble: true,
+      cancelBubble: true,
       cancelable: true,
       view: window,
       detail: 0,
@@ -46,6 +43,8 @@ eventTarget.dispatchEvent(event); */
     },
 
     touch : {
+      canBubble: true,
+      cancelable: true,
       touches : [],
       targetTouches : [],
       changedTouches : [],
@@ -85,25 +84,43 @@ eventTarget.dispatchEvent(event); */
     },
 
 
-    initTouch : {
+    // Deprecated
+    keyboard : {
       canBubble: true,
       cancelable: true,
       view: window,
-      detail: 0,
-      screenX: 0,
-      screenY: 0,
-      clientX: 0,
-      clientY: 0,
-      ctrlKey: false,
-      altKey: false,
-      shiftKey: false,
-      metaKey: false,
-      touches: [],
-      targetTouches: [],
-      changedTouches: [],
-      scale: 1,
-      rotation: 0,
-      touchItem: 0
+      char : "",
+      key : "",
+      location : 0,
+      modifiersList : null,
+      repeat : false
+    },
+
+    key : {
+      bubbles : true,
+      cancelable : true,
+      view : window,
+      ctrlKey : false,
+      altKey : false,
+      shiftKey : false,
+      metaKey : false,
+      keyCode : 9,
+      charCode : 0
+    },
+
+    keyEventInit : {
+      key : "",
+      code : "",
+      location : 0,
+      ctrlKey : false,
+      shiftKey : false,
+      altKey : false,
+      metaKey : false,
+      repeat : false,
+      isComposing : false,
+      charCode : 0,
+      keyCode : 0,
+      which : 0
     }
 
   };
@@ -165,75 +182,147 @@ eventTarget.dispatchEvent(event); */
     return eventName.indexOf("pointer") === 0;
   };
 
+  var isKeyBoardEvent = function(eventName) {
+    return eventName.indexOf("key") === 0;
+  };
 
-  var createBaseEvent = function (eventName, properties) {
+
+  var createUIEvent = function (eventName, properties) {
+
     var evt = null;
     properties = properties || {};
     properties = setDefaults("base", properties);
-    if (typeof Event != "undefined") {
-      evt = Event(eventName, properties);
-    } else {
-      evt = document.createEvent('Event');
-      evt.initEvent([eventName].concat(Object.values(properties)));
+
+    if (typeof UIEvent != "undefined") {
+      try {
+        evt = new UIEvent(eventName, properties);
+      } catch(err) {
+         Logger.info("UIEvent construnctor not supported on, document.createEvent used instead.");
+      }
     }
+
+    if(evt === null) {
+      evt = document.createEvent('UIEvent');
+      evt.initUIEvent.apply(evt, [eventName].concat(Object.values(properties)));
+    }
+
+    return evt;
+  };
+
+
+  var createKeyBoardEvent = function (eventName, properties) {
+
+    var evt = null;
+
+    properties = properties || {};
+    if(keyEventSpec == "key") {
+      properties = setDefaults("key", properties);
+    } else {
+      properties = setDefaults("keyboard", properties);
+    }
+
+    if (typeof KeyboardEvent != "undefined") {
+      try {
+        evt = new KeyboardEvent(eventName, Object.assign(properties, eventProperties.keyEventInit));
+      } catch(err) {
+        Logger.info("KeyboardEvent construnctor not supported on, document.createEvent used instead.");
+      }
+    }
+
+    if(evt === null) {
+      evt = document.createEvent('KeyboardEvent');
+      var init = evt.initKeyEvent || evt.initKeyboardEvent;
+      init.apply(evt, [eventName].concat(Object.values(properties)));
+    }
+
     return evt;
   };
 
 
   var createMouseEvent = function (eventName, properties) {
+
     var evt = null;
     properties = properties || {};
     properties = setDefaults("mouse", properties);
+
     if (typeof MouseEvent != "undefined") {
-      evt = new MouseEvent(eventName, properties);
-    } else {
-      evt = document.createEvent('MouseEvent');
-      evt.initMouseEvent.apply([eventName].concat(Object.values(properties)));
+      try {
+        evt = new MouseEvent(eventName, properties);
+      } catch(err) {
+        Logger.info("MouseEvent construnctor not supported on, document.createEvent used instead.");
+      }
     }
+
+    if(evt === null) {
+      evt = document.createEvent('MouseEvent');
+      evt.initMouseEvent.apply(evt, [eventName].concat(Object.values(properties)));
+    }
+
     return evt;
   };
 
 
   var createTouchEvent = function (target, eventName, properties) {
+
     var evt = null;
     properties = properties || {};
     properties = setDefaults("touch", properties);
     properties = addDefaultTouches(target, eventName, properties);
+
     if (typeof TouchEvent != "undefined") {
-      evt = new TouchEvent(eventName, properties);
-    } else {
+      try {
+        evt = new TouchEvent(eventName, properties);
+      } catch(err) {
+        Logger.info("TouchEvent construnctor not supported on, document.createEvent used instead.");
+      }
+    }
+
+    if(evt === null) {
       evt = document.createEvent('TouchEvent');
       evt.initTouchEvent.apply(evt, [eventName].concat(Object.values(properties)));
     }
+
     return evt;
   };
 
 
   var createPointerEvent = function (eventName, properties) {
+
     var evt = null;
     properties = properties || {};
     properties = setDefaults("pointer", properties);
+
     if (typeof PointerEvent != "undefined") {
-      evt = new PointerEvent(eventName, properties);
-    } else {
+      try {
+        evt = new PointerEvent(eventName, properties);
+      } catch(err) {
+        Logger.info("PointerEvent construnctor not supported on, document.createEvent used instead.");
+      }
+    }
+
+    if(evt === null) {
       evt = document.createEvent('PointerEvent');
       evt.initPointerEvent.apply(evt, [eventName].concat(Object.values(properties)));
     }
+
     return evt;
   };
 
 
   var createEvent = function (item, eventName, properties) {
     if (isMouseEvent(eventName)) {
-      return createMouseEvent(eventName);
+      return createMouseEvent(eventName, properties);
     } else if (isTouchEvent(eventName)) {
       return createTouchEvent(item, eventName, properties);
     } else if (isPointerEvent(eventName)) {
-      return createPointerEvent(eventName);
+      return createPointerEvent(eventName, properties);
+    } else if(isKeyBoardEvent(eventName)) {
+      return createKeyBoardEvent(eventName, properties);
     } else {
-      return createBaseEvent(eventName);
+      return createUIEvent(eventName, properties);
     }
   };
+
 
 
   return {
@@ -251,12 +340,10 @@ eventTarget.dispatchEvent(event); */
     },
 
 
-    emitCustom : function (eventName, data) {
+    emit : function(eventName, data) {
       data = data || {};
       this.forEach(function (item) {
-        item.dispatchEvent(new CustomEvent(eventName, {
-          detail: data
-        }));
+        item.dispatchEvent(new CustomEvent(eventName, data));
       });
       return this;
     }
