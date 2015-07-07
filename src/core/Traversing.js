@@ -57,7 +57,7 @@ export default {
         }
       }
       sibling = sibling ? Collection.fromArray([sibling]) : Collection();
-      res = res.concat(sibling.find(selector));
+      res = selector ? res.concat(sibling.find(selector)) : res.concat(sibling);
     });
     return res;
   },
@@ -68,7 +68,7 @@ export default {
     var children = null;
     this.forEach(function(item) {
       children = Collection.fromArray(Array.prototype.slice.call(item.childNodes));
-      res = res.concat(children.find(selector));
+      res = selector ? res.concat(children.find(selector)) : res.concat(children);
     });
     return res;
   },
@@ -79,7 +79,7 @@ export default {
     var parent = null;
     this.forEach(function(item) {
       parent = item.parentNode ? Collection.fromArray([item.parentNode]) : Collection();
-      res = res.concat(parent.find(selector));
+      res = selector ? res.concat(parent.find(selector)) : res.concat(parent);
     });
     return res;
   }

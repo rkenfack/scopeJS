@@ -11,7 +11,6 @@ import Logger from "src/modules/Logger";
 import manipulation from "src/core/Manipulation";
 
 
-
 var Collection = function () {
   var collection = Object.create(Array.prototype);
   collection = (Array.apply(collection, arguments) || collection);
@@ -30,6 +29,7 @@ var Collection = function () {
 * @return {Collection} The created collection
 */
 Collection.fromArray = function (array) {
+  array = Array.isArray(array) ? array : [];
   var collection = Collection.apply(null, array);
   return (collection);
 };
@@ -57,13 +57,21 @@ Collection.query = function (selector, context) {
 *
 */
 Collection.create = function(htmlString) {
-  var container = document.createElement('div');
-  container.innerHTML = htmlString;
-  var children = Array.prototype.slice.call(container.childNodes, 0);
-  children = children.filter(function(child) {
-    return cssHelpers.isSuportedElement(child);
-  });
-  return Collection.fromArray(children);
+
+  if (typeof htmlString == "string") {
+
+    var container = document.createElement('div');
+    container.innerHTML = htmlString;
+    var children = Array.prototype.slice.call(container.childNodes, 0);
+    children = children.filter(function(child) {
+      return cssHelpers.isSuportedElement(child);
+    });
+    return Collection.fromArray(children);
+
+  } else {
+    return Collection.query(htmlString);
+  }
+
 };
 
 
@@ -99,14 +107,16 @@ Collection.addModule = function(module, override) {
 Collection.addStaticModule = function(module, override) {
   for(var name in module) {
     if((Collection[name] !== undefined) && (override !== true)) {
-      Collection[name] = module[name];
-    } else {
       Logger.error("Method '" + name + "' already available as static method.");
+    } else {
+      Collection[name] = module[name];
     }
   }
 };
 
-
+Collection.prototype = {
+  className : "scopeJS"
+};
 
 Object.assign(Collection, pageready);
 Object.assign(Collection.prototype, clazz);

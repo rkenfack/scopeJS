@@ -213,8 +213,8 @@ export default (function () {
   var createKeyBoardEvent = function (eventName, properties) {
 
     var evt = null;
-
     properties = properties || {};
+
     if(keyEventSpec == "key") {
       properties = setDefaults("key", properties);
     } else {
@@ -316,8 +316,6 @@ export default (function () {
       return createTouchEvent(item, eventName, properties);
     } else if (isPointerEvent(eventName)) {
       return createPointerEvent(eventName, properties);
-    } else if(isKeyBoardEvent(eventName)) {
-      return createKeyBoardEvent(eventName, properties);
     } else {
       return createUIEvent(eventName, properties);
     }
