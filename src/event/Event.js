@@ -23,11 +23,13 @@ export default {
         callback = function () {
           listener.apply(context, [].slice.call(arguments));
         };
+        el.addEventListener(eventType, callback, useCapture);
       } else {
         callback = listener;
       }
-      el.addEventListener(eventType, callback, useCapture);
       el.$$__listeners[eventType][listener.$$__listenerId] = {
+        type : eventType,
+        originalListener : listener,
         listener: callback,
         context: context,
         useCapture: useCapture
@@ -35,6 +37,7 @@ export default {
     });
     return this;
   },
+
 
 
   off : function (eventType, listener, context, useCapture) {
@@ -59,6 +62,7 @@ export default {
   },
 
 
+
   once : function (eventType, listener, context, useCapture) {
     context = context || this;
     this.forEach(function (el) {
@@ -74,6 +78,26 @@ export default {
       }
     });
     return this;
+  },
+
+
+
+  emit : function(eventType, data) {
+    var listeners = null;
+    var storedInfo = null;
+    this.forEach(function(el) {
+      if(el.$$__listeners[eventType]) {
+        listeners = el.$$__listeners[eventType];
+        for(var listenerId in listeners) {
+          storedInfo = listeners[listenerId];
+          storedInfo.originalListener.call(storedInfo.context, data);
+        }
+      }
+    });
+  },
+
+  emitNative : function(eventType, properties) {
+
   }
 
 };

@@ -4,9 +4,9 @@ import cssHelpers from "src/css/Helpers";
 import pageready from "src/event/pageReady";
 import clazz from "src/css/Class";
 import style from "src/css/Style";
+import dimension from "src/css/Dimension";
 import traversing from "src/core/Traversing";
 import events from "src/event/Event";
-import emitter from "src/event/Emitter";
 import Logger from "src/modules/Logger";
 import manipulation from "src/core/Manipulation";
 
@@ -107,13 +107,12 @@ Collection.addStaticModule = function(module, override) {
 };
 
 
-
 Object.assign(Collection, pageready);
 Object.assign(Collection.prototype, clazz);
 Object.assign(Collection.prototype, style);
 Object.assign(Collection.prototype, traversing);
+Object.assign(Collection.prototype, dimension);
 Object.assign(Collection.prototype, events);
-Object.assign(Collection.prototype, emitter);
 Object.assign(Collection.prototype, template);
 Object.assign(Collection.prototype, manipulation);
 
