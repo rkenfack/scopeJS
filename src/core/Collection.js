@@ -1,4 +1,3 @@
-import objectobserve from "src/resources/ObjectObserve";
 import template from "src/databinding/Template";
 import cssHelpers from "src/css/Helpers";
 import pageready from "src/event/pageReady";

@@ -10,9 +10,10 @@
 
 
 import polyfill from "src/polyfill/Object";
-import array from "src/polyfill/Array";
+import dataset from "src/polyfill/Dataset";
 import customEvent from "src/polyfill/CustomEvent";
 import promise from "src/polyfill/Promise";
+import objectobserve from "src/resources/ObjectObserve";
 import Collection from "src/core/Collection";
 import Observable from "src/databinding/Observable";
 import Router from "src/modules/Router";
