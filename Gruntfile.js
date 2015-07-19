@@ -42,7 +42,8 @@ module.exports = function (grunt) {
     },
 
     clean : {
-      build : ['dist/**/*']
+      build : ['dist/**/*'],
+      test : ['test/dist/**/*']
     }
 
   });
@@ -50,6 +51,6 @@ module.exports = function (grunt) {
   grunt.registerTask('source', ['clean:build', 'jshint', 'shell:build']);
   grunt.registerTask('min', ['clean:build', 'jshint', 'shell:buildMinify']);
   grunt.registerTask('build', ['clean:build', 'jshint', 'shell:build', 'shell:buildMinify']);
-  grunt.registerTask('buildTests', ['shell:buildTests']);
+  grunt.registerTask('buildTests', ['clean:test', 'shell:buildTests']);
   grunt.registerTask('buildTestsMinify', ['shell:buildTestsMinify']);
 }

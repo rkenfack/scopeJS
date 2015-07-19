@@ -10,6 +10,7 @@
 
 
 import polyfill from "src/polyfill/Object";
+import array from "src/polyfill/Array";
 import customEvent from "src/polyfill/CustomEvent";
 import promise from "src/polyfill/Promise";
 import Collection from "src/core/Collection";
