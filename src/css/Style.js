@@ -6,7 +6,7 @@ export default {
   getStyle : function (name) {
     name = cssHelpers.getPropertyName(name);
     if (this[0]) {
-      return this[0].style[utils.camelcase(name)];
+      return this[0].style[utils.camelCase(name)];
     }
   },
 
