@@ -62,10 +62,8 @@ export default (function () {
 
 
   var createUIEvent = function (eventName, properties) {
-
     var evt = null;
     properties = properties || {};
-
     if (typeof UIEvent != "undefined") {
       try {
         evt = new UIEvent(eventName, properties);
@@ -73,21 +71,17 @@ export default (function () {
          Logger.info("UIEvent construnctor not supported on, document.createEvent used instead.");
       }
     }
-
     if(evt === null) {
       evt = document.createEvent('UIEvent');
       evt.initUIEvent.apply(evt, [eventName].concat(Object.values(properties)));
     }
-
     return evt;
   };
 
 
   var createKeyBoardEvent = function (eventName, properties) {
-
     var evt = null;
     properties = properties || {};
-
     if (typeof KeyboardEvent != "undefined") {
       try {
         evt = new KeyboardEvent(eventName, properties);
@@ -95,22 +89,18 @@ export default (function () {
         Logger.info("KeyboardEvent construnctor not supported on, document.createEvent used instead.");
       }
     }
-
     if(evt === null) {
       evt = document.createEvent('KeyboardEvent');
       var init = evt.initKeyEvent || evt.initKeyboardEvent;
       init.apply(evt, [eventName].concat(Object.values(properties)));
     }
-
     return evt;
   };
 
 
   var createMouseEvent = function (eventName, properties) {
-
     var evt = null;
     properties = properties || {};
-
     if (typeof MouseEvent != "undefined") {
       try {
         evt = new MouseEvent(eventName, properties);
@@ -118,18 +108,15 @@ export default (function () {
         Logger.info("MouseEvent construnctor not supported on, document.createEvent used instead.");
       }
     }
-
     if(evt === null) {
       evt = document.createEvent('MouseEvent');
       evt.initMouseEvent.apply(evt, [eventName].concat(Object.values(properties)));
     }
-
     return evt;
   };
 
 
   var createTouchEvent = function (target, eventName, properties) {
-
     var evt = null;
     properties = properties || {};
     properties = addDefaultTouches(target, eventName, properties);

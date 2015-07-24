@@ -7,55 +7,69 @@ export default class Notifier {
     this.$$counter = 1;
   }
 
-
   registerEvent(type, callback, ctx, once) {
     ctx = ctx || window;
-    var currentId = ++this.$$counter;
     this.$$subscribers[type] = this.$$subscribers[type] || [];
-    this.$$subscribers[type].push({
-      id : this.$$counter,
+    var listener = {
       fn: callback,
+      fnCtx : function() { callback.apply(ctx, [].slice.call(arguments)); },
       scope: ctx,
       once : once
-    });
-    return currentId;
+    };
+    this.$$subscribers[type].push(listener);
+    return listener;
   }
 
 
   on(type, callback, ctx) {
-    this.registerEvent(type, callback, ctx, false);
+    return this.registerEvent(type, callback, ctx, false);
   }
 
 
   off(type, callback, ctx) {
     ctx = ctx || window;
+    var removed = [];
+    this.$$subscribers[type] = this.$$subscribers[type] || [];
     this.$$subscribers[type] = this.$$subscribers[type].filter(function (subscriber) {
       if (!((subscriber.fn == callback) && (subscriber.scope == ctx))) {
-        return subscriber;
+        removed.push(subscriber);
+        return true;
       }
     });
     if(this.$$subscribers[type].length === 0) {
       delete this.$$subscribers[type];
     }
+    return removed;
   }
 
 
   once(type, callback, ctx) {
-    this.registerEvent(type, callback, ctx, true);
+    return this.registerEvent(type, callback, ctx, true);
   }
 
 
   emit(type, message) {
+
+    var removed = [];
     this.$$subscribers[type] = this.$$subscribers[type] || [];
     this.$$subscribers[type].forEach(function (subscriber, index) {
       subscriber.fn.call(subscriber.scope, message);
       if(subscriber.once === true) {
-        this.$$subscribers[type].splice(index, 1);
-        if(this.$$subscribers[type].length === 0) {
-          delete this.$$subscribers[type];
-        }
+        removed.push(subscriber);
       }
     });
+
+    var index = null;
+    removed.forEach(function(toRemove) {
+      index = this.$$subscribers[type].indexOf(toRemove);
+      this.$$subscribers[type].splice(index, 1);
+    }, this);
+
+    if(this.$$subscribers[type].length === 0) {
+      delete this.$$subscribers[type];
+    }
+
+    return removed;
   }
 
   emitNative(eventName, properties) {
