@@ -1,6 +1,7 @@
 import utils from "src/utils/Utils";
 import helpers from "src/event/Helpers";
 import Notifier from "src/event/Notifier";
+import emitter from "src/event/Emitter";
 
 export default (function() {
 
@@ -69,8 +70,12 @@ export default (function() {
     },
 
     emitNative : function(eventType, properties) {
-      var notifier = new Notifier();
-      notifier.emitNative.call(this, eventType, properties);
+      emitter.emitNative.call(this, eventType, properties);
+      return this;
+    },
+
+    emitCustom : function(eventType, detail) {
+      emitter.emitCustom.call(this, eventType, detail);
       return this;
     }
   };

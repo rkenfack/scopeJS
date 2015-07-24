@@ -20,7 +20,6 @@ import Router from "src/modules/Router";
 import Http from "src/modules/Http";
 import Logger from "src/modules/Logger";
 import HTMLParser from "src/HTMLParser/HTMLParser";
-import Emitter from "src/event/Emitter";
 
 (function(global) {
 
@@ -36,7 +35,6 @@ import Emitter from "src/event/Emitter";
   scope.http = Http.qwest;
   scope.Logger = Logger;
   scope.HTMLParser = HTMLParser;
-  scope.Emitter = Emitter;
 
   global.scope = scope;
   global.Observable = Observable;

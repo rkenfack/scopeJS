@@ -179,6 +179,7 @@ export default (function () {
   return {
 
     emitNative : function (eventName, properties) {
+      properties = properties || {};
       this.forEach(function (item) {
         if (eventHelpers.isEventSupported(item, eventName)) {
           var evt = createEvent(item, eventName, properties);
