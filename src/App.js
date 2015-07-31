@@ -7,6 +7,17 @@
 
 // http://casperjs.org/
 // https://github.com/web-animations/web-animations-js
+// https://github.com/Fyrd/caniuse
+
+/*var MyClass = {
+  prototype: {
+    // prototypal members and methods
+  },
+  create: function(options){
+    // do stuff with options
+    return Object.create(MyClass.prototype, options);
+  }
+};*/
 
 
 import polyfill from "src/polyfill/Object";
@@ -21,7 +32,7 @@ import Http from "src/modules/Http";
 import Logger from "src/modules/Logger";
 import HTMLParser from "src/HTMLParser/HTMLParser";
 
-(function(global) {
+export default (function() {
 
   var scope = function(selector, ctx) {
     return Collection.query(selector, ctx);
@@ -35,14 +46,25 @@ import HTMLParser from "src/HTMLParser/HTMLParser";
   scope.http = Http.qwest;
   scope.Logger = Logger;
   scope.HTMLParser = HTMLParser;
+  scope.Observable = Observable;
 
-  global.scope = scope;
-  global.Observable = Observable;
+  var _scope = scope;
 
-  global.$ = global.scope;
+  scope.noConflict = function() {
+    return _scope;
+  };
+
+  if(typeof window != "undefined") {
+    window.scope = window.$ = scope;
+  }
 
 
-})(window);
+  return scope;
+
+})();
+
+
+
 
 
 

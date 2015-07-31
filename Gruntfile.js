@@ -8,12 +8,13 @@ module.exports = function (grunt) {
 
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
     shell: {
       build: {
-        command: 'jspm bundle-sfx src/App + src/development dist/scope.js'
+        command: 'jspm bundle-sfx src/App + src/development dist/<%= pkg.name %>.js'
       },
       buildMinify: {
-        command: 'jspm bundle-sfx src/App + src/production dist/scope-min.js --minify'
+        command: 'jspm bundle-sfx src/App + src/production dist/<%= pkg.name %>-min.js --minify'
       },
       buildTests : {
         command : "jspm bundle-sfx test/Test + test/run test/dist/test.js"
