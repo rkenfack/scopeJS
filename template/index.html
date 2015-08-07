@@ -1,0 +1,86 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head>
+
+
+  <script src="index.js"></script>
+
+  <script type="text/javascript">
+
+
+  var controller = {
+    showUser : function(name, profession) {
+      console.log(name, profession);
+    }
+  };
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+      var node = document.getElementById("template");
+      var model = {
+        title : "Employees",
+        persons : [
+            {
+            name : "Romeo",
+            profession : "Informatiker",
+            qualifications : [{name : "javascript", level : "gut"}, {name : "PHP", level : "gut"}]
+          }
+          ]
+      };
+
+      var tpl = template(node, model);
+
+
+      window.setTimeout(function() {
+
+        model = {
+          title : "Employees",
+          persons : [
+            {
+            name : "Romeo",
+            profession : "Informatiker",
+            qualifications : [{name : "javascript", level : "gut"}, {name : "PHP", level : "gut"}]
+          },
+         {
+            name : "Romeo",
+            profession : "Informatiker",
+            qualifications : [{name : "javascript", level : "gut"}, {name : "PHP", level : "gut"}]
+          },
+          {
+            name : "Romeo",
+            profession : "Informatiker",
+            qualifications : [{name : "javascript", level : "gut"}, {name : "PHP", level : "gut"}]
+          }
+          ]
+        };
+
+        tpl.dispose();
+        tpl.update(node, model);
+
+      }, 3000);
+
+
+
+    }, false);
+
+
+  </script>
+
+
+</head>
+
+<body>
+
+  <ul id="template" data-repeat="{{ person in persons }}" class="{{title}}">
+     {{person.name}}  ist ein {{ person.profession }}
+    <h1 data-click="controller.showUser(person)" >He has following qualification</h1>
+    <ul class="{{person.name}}" data-repeat="{{ qualification in person.qualifications }}">
+      <li >{{qualification.name}} : {{qualification.level}}</li>
+    </ul>
+  </ul>
+
+</body>
+
+</html>
