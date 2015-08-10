@@ -30,7 +30,7 @@
           ]
       };
 
-      var tpl = template(node, model);
+      var tpl = Template.create(node, model);
 
 
       window.setTimeout(function() {
@@ -56,10 +56,14 @@
           ]
         };
 
-        tpl.dispose();
-        tpl.update(node, model);
+        tpl.update(model);
 
       }, 3000);
+
+
+      window.setTimeout(function(){
+       // tpl.dispose();
+      }, 4000)
 
 
 
