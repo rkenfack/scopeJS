@@ -105,15 +105,17 @@ Collection.addStaticModule = function(module, override) {
   }
 };
 
-
 Object.assign(Collection, pageready);
 Object.assign(Collection.prototype, clazz);
 Object.assign(Collection.prototype, style);
 Object.assign(Collection.prototype, traversing);
 Object.assign(Collection.prototype, dimension);
 Object.assign(Collection.prototype, events);
-Object.assign(Collection.prototype, template);
 Object.assign(Collection.prototype, manipulation);
+
+Collection.addModule({
+  template : template.template
+});
 
 
 export default Collection;

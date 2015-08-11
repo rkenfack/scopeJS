@@ -1,25 +1,30 @@
-<!doctype html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 
 <head>
 
 
   <script src="index.js"></script>
-
   <script type="text/javascript">
 
 
+  var tpl;
+  var model;
+
   var controller = {
-    showUser : function(name, profession) {
-      console.log(name, profession);
+    showUser : function(person) {
+      person.name = "Romeo Kenfack Tsakem";
+      tpl.update(model);
     }
   };
-
 
     document.addEventListener("DOMContentLoaded", function() {
 
       var node = document.getElementById("template");
-      var model = {
+
+      model = {
+        active : true,
+        myclass : "ss",
         title : "Employees",
         persons : [
             {
@@ -30,12 +35,21 @@
           ]
       };
 
-      var tpl = Template.create(node, model);
+      tpl = Template.create(node, model);
+
+      Object.observe(model, function() {
+        tpl.update(model);
+      });
+
+      window.setTimeout(function() {
+        model.myclass = "romeo"
+      }, 2000);
 
 
       window.setTimeout(function() {
 
         model = {
+          myClass : "ss",
           title : "Employees",
           persons : [
             {
@@ -61,7 +75,7 @@
       }, 3000);
 
 
-      window.setTimeout(function(){
+      window.setTimeout(function() {
        // tpl.dispose();
       }, 4000)
 
@@ -77,11 +91,11 @@
 
 <body>
 
-  <ul id="template" data-repeat="{{ person in persons }}" class="{{title}}">
+  <ul disabled="{{active}}" id="template" cla{{myClass}}="{{title}}" data-repeat="{{ person in persons }}" >
      {{person.name}}  ist ein {{ person.profession }}
-    <h1 data-click="controller.showUser(person)" >He has following qualification</h1>
+    <h1 data-click="controller.showUser(person)">He has following qualification</h1>
     <ul class="{{person.name}}" data-repeat="{{ qualification in person.qualifications }}">
-      <li >{{qualification.name}} : {{qualification.level}}</li>
+      <li >{{$key}} - {{qualification.name}} : {{qualification.level}}</li>
     </ul>
   </ul>
 
