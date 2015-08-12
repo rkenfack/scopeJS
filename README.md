@@ -4,15 +4,14 @@ Dom based templating, routing and so on.
 
 ## Features
 
-- ### DOM Manipulation
-- ### Routing
-- ### Templating
-- ### XHR
-- ### Animations
-- ### Observable class
-- ### Polyfills (Promise, CustomEvent, Dataset, request-/cancelAnimationFrame)
-
-## Browser support
+### DOM Manipulation
+### Routing
+### Templating
+### XHR
+### Animations
+### Observable class
+### Polyfills (Promise, CustomEvent, Dataset, request-/cancelAnimationFrame)
+### Browser support
 
 
 
