@@ -14,7 +14,7 @@ If your are familiar with jquery, the api will be easy to use.
 An angular like dom based templating
 ### XHR
 ### Animations
-The Animation module is a wrapper of the [web-animation](https://github.com/pyrsmk/qwest) library
+The Animation module is a wrapper of the [web-animation](https://github.com/web-animations/web-animations-js) library
 ### Observable class
 A class you can extend if you want to observe the properties of your instances and be notify when changes occure.
 ### Polyfills (Promise, CustomEvent, Dataset, request-/cancelAnimationFrame)
