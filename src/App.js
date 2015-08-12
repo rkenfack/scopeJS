@@ -1,30 +1,20 @@
 /**
-  Browser support : IE10, Chrome , Firefox
+  Browser support : IE9, Chrome , Firefox
   @version 0.0.1
   @author Romeo Kenfack Tsakem
 */
 
 
 // http://casperjs.org/
-// https://github.com/web-animations/web-animations-js
 // https://github.com/Fyrd/caniuse
 
-/*var MyClass = {
-  prototype: {
-    // prototypal members and methods
-  },
-  create: function(options){
-    // do stuff with options
-    return Object.create(MyClass.prototype, options);
-  }
-};*/
-
-
+import windowPolyfills from "src/polyfill/Window";
 import polyfill from "src/polyfill/Object";
 import dataset from "src/polyfill/Dataset";
 import customEvent from "src/polyfill/CustomEvent";
 import promise from "src/polyfill/Promise";
 import objectobserve from "src/resources/ObjectObserve";
+import webanimation from "src/resources/web-animations-next.min";
 import Collection from "src/core/Collection";
 import Observable from "src/databinding/Observable";
 import Router from "src/modules/Router";

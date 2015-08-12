@@ -1,11 +1,13 @@
-
 export default (function () {
 
-  var Template = function (node, scope) {
+  var Template = function (node, scope, ctx) {
+    ctx = ctx || window;
     node.$$template = {
       node: node.cloneNode(true),
-      instance: this
+      instance: this,
+      ctx: ctx
     };
+    this._ctx = ctx;
     this._node = node;
     this._render(node, scope);
   };
@@ -16,7 +18,7 @@ export default (function () {
     TEXT: 3
   };
 
-  Template.applyChanges = function(template, model) {
+  Template.applyChanges = function (template, model) {
 
     var firstCharCode = null;
     var keysArray = Object.keys(Object(model));
@@ -24,12 +26,12 @@ export default (function () {
 
     for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
       var nextKey = keysArray[nextIndex];
-      if((nextKey.toLowerCase().charAt(0) != "_") && (nextKey.toLowerCase().charAt(0) != "$")) {
-        changeCount ++;
+      if ((nextKey.toLowerCase().charAt(0) != "_") && (nextKey.toLowerCase().charAt(0) != "$")) {
+        changeCount++;
       }
     }
 
-    if(changeCount > 0) {
+    if (changeCount > 0) {
       template.update(model);
     }
 
@@ -72,9 +74,9 @@ export default (function () {
   };
 
 
-  Template.create = function (node, model) {
+  Template.create = function (node, model, ctx) {
     if (!node.$$template) {
-      return new Template(node, model);
+      return new Template(node, model, ctx);
     } else {
       var parent = node.parentNode;
       var oldNode = node;
@@ -82,7 +84,8 @@ export default (function () {
       node = node.$$template.node;
       node.$$template = {
         node: node.cloneNode(true),
-        instance: instance
+        instance: instance,
+        ctx: ctx
       };
       node.$$template.instance._removeListeners.call(node.$$template.instance);
       node.$$template.instance._render.call(node.$$template.instance, node, model);
@@ -237,10 +240,11 @@ export default (function () {
             throw "The function " + funcString + " is not defined";
           }
         }
-        return function () {
+        return function (e) {
+          args.push(e);
           ref.apply(this, args);
         };
-      })();
+      }.bind(this._ctx))();
 
     },
 
@@ -346,7 +350,7 @@ export default (function () {
           fragement.appendChild(child);
         });
         fragments.push(fragement);
-        var loop = function(child) {
+        var loop = function (child) {
           fragement.appendChild(child.cloneNode(true));
         };
         for (var i = 1; i < l; i++) {
@@ -395,8 +399,8 @@ export default (function () {
     addSpecials: Template.addSpecials,
     removeSpecial: Template.removeSpecial,
 
-    template : function(model) {
-      var template = Template.create(this[0], model);
+    template: function (model, ctx) {
+      var template = Template.create(this[0], model, ctx);
       Object.observe(model, Template.applyChanges.bind(this, template, model));
       return this;
     }

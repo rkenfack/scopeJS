@@ -12,6 +12,10 @@ export default {
     "[object Error]": "Error"
   },
 
+  getType : function(value) {
+    return this.getClass(value);
+  },
+
   getClass: function (value) {
     // The typeof null and undefined is "object" under IE8
     if (value === undefined) {

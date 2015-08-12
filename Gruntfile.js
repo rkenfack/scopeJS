@@ -31,7 +31,7 @@ module.exports = function (grunt) {
         browser: true,
         ignores : [
           'src/resources/ObjectObserve.js',
-          'src/resources/Soma-template.js',
+          'src/resources/web-animations-next.min.js',
           'src/polyfill/Promise.js',
           'src/modules/Router.js',
           'src/modules/Http.js',

@@ -8,6 +8,7 @@ import traversing from "src/core/Traversing";
 import events from "src/event/Event";
 import Logger from "src/modules/Logger";
 import manipulation from "src/core/Manipulation";
+import animation from "src/modules/Animation";
 
 
 
@@ -98,24 +99,35 @@ Collection.addModule = function(module, override) {
 Collection.addStaticModule = function(module, override) {
   for(var name in module) {
     if((Collection[name] !== undefined) && (override !== true)) {
-      Collection[name] = module[name];
-    } else {
       Logger.error("Method '" + name + "' already available as static method.");
+    } else {
+      Collection[name] = module[name];
     }
+
   }
 };
 
-Object.assign(Collection, pageready);
-Object.assign(Collection.prototype, clazz);
-Object.assign(Collection.prototype, style);
-Object.assign(Collection.prototype, traversing);
-Object.assign(Collection.prototype, dimension);
-Object.assign(Collection.prototype, events);
-Object.assign(Collection.prototype, manipulation);
 
+Collection.addModule(clazz);
+Collection.addModule(style);
+Collection.addModule(traversing);
+Collection.addModule(dimension);
+Collection.addModule(events);
+Collection.addModule(manipulation);
+Collection.addModule(animation);
 Collection.addModule({
   template : template.template
 });
+
+
+Collection.addStaticModule({
+  template : {
+    addSpecial : template.addSpecial,
+    addSpecials : template.addSpecials,
+    removeSpecial : template.removeSpecial
+  }
+});
+Collection.addStaticModule(pageready);
 
 
 export default Collection;

@@ -3,6 +3,15 @@
 
 <head>
 
+<style>
+
+  .pulse{
+    width : 100px;
+    height : 100px;
+    background-color: red;
+  }
+</style>
+
   <script src="jspm_packages/system.js"></script>
   <script src="config.js"></script>
 
@@ -26,7 +35,7 @@
       });
 
 
-     scope("#active").emitNative("keyup", {"char" : "a"});
+     //scope("#active").emitNative("keyup", {"char" : "a"});
 
 
       var model = {
@@ -37,11 +46,12 @@
           console.log(e)
         },
         changeActiveState : function(e) {
+          console.log(e)
           model.active = scope("#active")[0].checked;
         }
       };
 
-      scope("#target").template(model);
+      scope("#target").template(model, model);
 
       model.name = "Romeo Kenfack Tsakem";
       model.age = 34;
@@ -75,6 +85,17 @@
 
       //var clone = target.clone(false).insertAfter(target);
 
+     scope(".pulse").animate([{opacity: 0.5, transform: "scale(0.5)"},
+        {opacity: 1.0, transform: "scale(1)"}], {
+        direction: 'alternate',
+        duration: 500
+
+    }).on("animationEnd", function(e){
+      console.log(e)
+    })
+
+
+
     };
 
 
@@ -92,9 +113,14 @@
 
 
 
+
+
+
 </head>
 
 <body>
+
+<div class="pulse" style="width:150px;">Hello world!</div>
 
   <div id="testEL" class="testClass">
     <ul>
