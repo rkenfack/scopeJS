@@ -18,33 +18,43 @@ import webanimation from "src/resources/web-animations-next.min";
 import Collection from "src/core/Collection";
 import Observable from "src/databinding/Observable";
 import Router from "src/modules/Router";
-import Http from "src/modules/Http";
+import xhr from "src/modules/XHR";
 import Logger from "src/modules/Logger";
-import HTMLParser from "src/HTMLParser/HTMLParser";
 
-export default (function() {
+export default (function () {
 
-  var scope = function(selector, ctx) {
+  var scope = function (selector, ctx) {
     return Collection.query(selector, ctx);
   };
 
+
+  for(var module in Collection) {
+    if(Collection.hasOwnProperty(module)) {
+      if(typeof Collection[module] == "function") {
+        scope[module] = Collection[module].bind(scope);
+      } else {
+        scope[module] = Collection[module];
+      }
+    }
+  }
+
   scope.addModule = Collection.addModule;
-  scope.addStaticModule = Collection.addStaticModule;
-  scope.ready = Collection.ready;
-  scope.create = Collection.create;
-  scope.Router = Router.Router;
-  scope.http = Http.qwest;
-  scope.Logger = Logger;
-  scope.HTMLParser = HTMLParser;
-  scope.Observable = Observable;
+
+  scope.addStaticModule(xhr);
+
+  scope.addStaticModule({
+    Router: Router.Router,
+    Logger: Logger,
+    Observable: Observable
+  });
 
   var _scope = scope;
 
-  scope.noConflict = function() {
+  scope.noConflict = function () {
     return _scope;
   };
 
-  if(typeof window != "undefined") {
+  if (typeof window != "undefined") {
     window.scope = window.$ = scope;
   }
 
@@ -52,17 +62,3 @@ export default (function() {
   return scope;
 
 })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-

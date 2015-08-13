@@ -98,12 +98,11 @@ Collection.addModule = function(module, override) {
 */
 Collection.addStaticModule = function(module, override) {
   for(var name in module) {
-    if((Collection[name] !== undefined) && (override !== true)) {
+    if((this[name] !== undefined) && (override !== true)) {
       Logger.error("Method '" + name + "' already available as static method.");
     } else {
-      Collection[name] = module[name];
+      this[name] = module[name];
     }
-
   }
 };
 

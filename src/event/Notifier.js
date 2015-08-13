@@ -8,7 +8,7 @@ export default class Notifier {
   }
 
   registerEvent(type, callback, ctx, once) {
-    ctx = ctx || window;
+    ctx = ctx || this;
     this.$$subscribers[type] = this.$$subscribers[type] || [];
     var listener = {
       fn: callback,
@@ -27,7 +27,7 @@ export default class Notifier {
 
 
   off(type, callback, ctx) {
-    ctx = ctx || window;
+    ctx = ctx || this;
     var removed = [];
     this.$$subscribers[type] = this.$$subscribers[type] || [];
     this.$$subscribers[type] = this.$$subscribers[type].filter(function (subscriber) {
