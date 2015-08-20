@@ -5,6 +5,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
 
   grunt.initConfig({
@@ -30,7 +31,7 @@ module.exports = function (grunt) {
         curly: true,
         browser: true,
         ignores : [
-          'src/resources/ObjectObserve.js',
+          'src/resources/objectobserve.min.js',
           'src/resources/web-animations-next.min.js',
           'src/polyfill/Promise.js',
           'src/modules/Router.js',
@@ -45,13 +46,27 @@ module.exports = function (grunt) {
     clean : {
       build : ['dist/**/*'],
       test : ['test/dist/**/*']
+    },
+
+    concat: {
+      options: {
+        separator: grunt.util.linefeed,
+      },
+      source: {
+        src: ['src/resources/objectobserve.min.js', 'dist/<%= pkg.name %>.js'],
+        dest: 'dist/<%= pkg.name %>.js'
+      },
+      min : {
+        src: ['src/resources/objectobserve.min.js', 'dist/<%= pkg.name %>-min.js'],
+        dest: 'dist/<%= pkg.name %>-min.js'
+      }
     }
 
   });
 
-  grunt.registerTask('source', ['clean:build', 'jshint', 'shell:build']);
-  grunt.registerTask('min', ['clean:build', 'jshint', 'shell:buildMinify']);
-  grunt.registerTask('build', ['clean:build', 'jshint', 'shell:build', 'shell:buildMinify']);
+  grunt.registerTask('source', ['clean:build', 'jshint', 'shell:build', 'concat:source']);
+  grunt.registerTask('min', ['clean:build', 'jshint', 'shell:buildMinify', 'concat:min']);
+  grunt.registerTask('build', ['clean:build', 'jshint', 'shell:build', 'shell:buildMinify', 'concat:source', 'concat:min']);
   grunt.registerTask('buildTests', ['clean:test', 'shell:buildTests']);
   grunt.registerTask('buildTestsMinify', ['shell:buildTestsMinify']);
 }

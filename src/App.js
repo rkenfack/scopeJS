@@ -13,7 +13,6 @@ import polyfill from "src/polyfill/Object";
 import dataset from "src/polyfill/Dataset";
 import customEvent from "src/polyfill/CustomEvent";
 import promise from "src/polyfill/Promise";
-import objectobserve from "src/resources/ObjectObserve";
 import webanimation from "src/resources/web-animations-next.min";
 import Collection from "src/core/Collection";
 import Observable from "src/databinding/Observable";

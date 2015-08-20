@@ -1,3 +1,5 @@
+// TODO : Partial rendering
+
 export default (function () {
 
   var Template = function (node, scope, ctx) {
@@ -9,16 +11,20 @@ export default (function () {
     };
     this._ctx = ctx;
     this._node = node;
+    this._currentPath = "";
     this._render(node, scope);
   };
+
 
   Template.NODE_TYPE = {
     ELEMENT: 1,
     ATTR: 2,
-    TEXT: 3
+    TEXT: 3,
+    DOCUMENT_FRAGMENT: 11
   };
 
-  Template.applyChanges = function (template, model) {
+
+  Template.applyChanges = function (template, model, changes) {
 
     var firstCharCode = null;
     var keysArray = Object.keys(Object(model));
@@ -34,16 +40,32 @@ export default (function () {
     if (changeCount > 0) {
       template.update(model);
     }
-
   };
+
 
   Template.verySpecials = ["checked", "multiple", "readonly", "disabled"];
 
+
+  Template.conditions = ["if", "show", "hide"];
+
+
   Template.specials = {};
+
+  Template.insertAfter = function(newNode, targetNode) {
+    var itemToInsert = newNode;
+    var parent = targetNode.parentNode;
+    var children = Template.getChildren(parent);
+    if(children[children.length-1] == targetNode) {
+      parent.appendChild(itemToInsert);
+    } else {
+      parent.insertBefore(itemToInsert, targetNode.nextSibling);
+    }
+  };
 
   Template.addSpecial = function (attrName, mapTo) {
     Template.specials[attrName] = mapTo;
   };
+
 
   Template.addSpecials = function (attrs) {
     for (var p in attrs) {
@@ -51,12 +73,44 @@ export default (function () {
     }
   };
 
+
   Template.removeSpecial = function (attrName, mapTo) {
     delete Template.specials[attrName];
   };
 
 
+  Template.executeCode = function (code, scope) {
+    return (function (codeToRun) {
+      var vars = codeToRun.match(Template.regex.varName);
+      var parts;
+      vars.forEach(function (vr) {
+        codeToRun = codeToRun.replace(vr, Template._getPathValue(scope, vr));
+      });
+      codeToRun = "'use strict'; return " + codeToRun;
+      var tmpFunc = new Function(codeToRun); // jshint ignore:line
+      return tmpFunc.apply({});
+    })(code);
+  };
+
+
+  Template.escapeHtml = function (str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  };
+
+
+  // UNSAFE with unsafe strings; only use on previously-escaped ones!
+  Template.unescapeHtml = function (escapedStr) {
+    var div = document.createElement('div');
+    div.innerHTML = escapedStr;
+    var child = div.childNodes[0];
+    return child ? child.nodeValue : '';
+  };
+
+
   Template.regex = {
+    varName: /[a-zA-Z_$]+[0-9a-zA-Z_$]*(.[a-zA-Z_$]+[0-9a-zA-Z_$])*/g,
     sequence: null,
     token: /\{\{\s*\$?[\w]+\.?[\w]*\s*\}\}/g,
     tokenName: /\w+/,
@@ -74,7 +128,41 @@ export default (function () {
   };
 
 
+  Template._getPathValue = function (obj, path) {
+
+    var parts = path.split(".");
+    var res = obj;
+
+    if (parts.length == 1) {
+      if (typeof obj[path] !== undefined) {
+        res = obj[path];
+      }
+    } else {
+      for (var i = 0; i < parts.length; i++) {
+        res = res[parts[i]];
+        if (res === undefined) {
+          res = obj;
+          break;
+        }
+      }
+    }
+
+    return res;
+  };
+
+  Template.getChildren = function(list) {
+    var children = Array.prototype.slice.call(list.childNodes);
+    return children.filter(function(node) {
+      if((node.nodeType == Template.NODE_TYPE.TEXT) && (node.textContent.trim() === "")) {
+        return false;
+      }
+      return true;
+    });
+  };
+
+
   Template.create = function (node, model, ctx) {
+
     if (!node.$$template) {
       return new Template(node, model, ctx);
     } else {
@@ -97,9 +185,25 @@ export default (function () {
 
   Template.prototype = {
 
+    _currentPath: null,
+
     _node: null,
 
     _listeners: [],
+
+    _modelListeners: {},
+
+    _onModelChange: function (changes) {
+      var that = this;
+      changes.forEach(function (change) {
+        var listeners = that._modelListeners[change.name];
+        if (listeners) {
+          listeners.forEach(function (listener) {
+            listener.callback(that, change);
+          });
+        }
+      });
+    },
 
     dispose: function () {
       this._removeListeners();
@@ -172,27 +276,6 @@ export default (function () {
     },
 
 
-    _getPathValue: function (obj, path) {
-      var parts = path.split(".");
-      var res = obj;
-      if (parts.length == 1) {
-        if (typeof obj[path] !== undefined) {
-          return obj[path];
-        }
-      } else {
-        for (var i = 0; i < parts.length; i++) {
-          res = res[parts[i]];
-          if (res === undefined) {
-            res = obj;
-            break;
-          }
-        }
-        return res;
-      }
-
-    },
-
-
     _renderTextNode: function (node, scope) {
       node.textContent = this._renderText(node.textContent, scope);
     },
@@ -202,7 +285,7 @@ export default (function () {
       if (text.length > 0) {
         var expressions = this._getExpressions(text);
         expressions.forEach(function (expression) {
-          text = text.replace(expression.templExp, this._getPathValue(scope, expression.paramName));
+          text = text.replace(expression.templExp, Template._getPathValue(scope, expression.paramName));
         }.bind(this));
         return text;
       }
@@ -217,7 +300,7 @@ export default (function () {
       var params = funcString.substr(startPos + 1, endPos - startPos - 1).trim();
       if (params.length > 0) {
         params = params.split(",").map(function (param) {
-          return this._getPathValue(scope, param.trim());
+          return Template._getPathValue(scope, param.trim());
         }.bind(this));
       } else {
         params = [];
@@ -253,32 +336,60 @@ export default (function () {
 
       var attrValue = node.value;
       var nodeName = this._renderText(node.name, scope);
-      var expressions = this._getExpressions(attrValue);
       var removedAttr = false;
 
-      if (expressions.length) {
-        expressions.forEach(function (expression) {
-          attrValue = attrValue.replace(expression.templExp, this._getPathValue(scope, expression.paramName));
-        }.bind(this));
+      var parts = node.name.split("-");
+
+      if ((parts.length == 2) && this._isEventSupported(refNode, parts[1])) {
+
+        var eventName = parts[1];
+        var callback = attrValue;
+        refNode.removeAttribute(node.name);
+
+        var funcCall = this._getParamList(scope, callback);
+        callback = this._callFunction(funcCall.funcName, funcCall.params);
+        this._listeners.push({
+          node: refNode,
+          eventName: eventName,
+          listener: callback
+        });
+
+        refNode.addEventListener(eventName, callback, false);
+
       } else {
 
-        var parts = node.name.split("-");
-        if (parts.length == 2) {
-          if (this._isEventSupported(refNode, parts[1])) {
-            var eventName = parts[1];
-            var callback = attrValue;
-            refNode.removeAttribute(node.name);
-            var funcCall = this._getParamList(scope, callback);
-            callback = this._callFunction(funcCall.funcName, funcCall.params);
-            this._listeners.push({
-              node: refNode,
-              eventName: eventName,
-              listener: callback
-            });
-            refNode.addEventListener(eventName, callback, false);
+        if ((parts.length == 2) && (Template.conditions.indexOf(parts[1]) != -1)) {
+
+          var newstr = attrValue.replace(/{/g, "").replace(/}/g, "");
+          removedAttr = true;
+
+          var conditionValue = Template.executeCode(newstr, scope);
+
+          // PathObserver
+
+          switch (node.name) {
+
+          case "data-if":
+            if (conditionValue === true) {
+
+            }
+            break;
+          case "data-show":
+            break;
+
+          case "data-hide":
+            break;
+
+          }
+
+        } else {
+          var expressions = this._getExpressions(attrValue);
+          if (expressions.length) {
+            expressions.forEach(function (expression) {
+              attrValue = attrValue.replace(expression.templExp, Template._getPathValue(scope, expression.paramName));
+            }.bind(this));
           }
         }
-
       }
 
       node.value = attrValue;
@@ -317,16 +428,80 @@ export default (function () {
     },
 
 
-    _render: function (node, scope) {
+    _buildSubScope: function (data, repeatExpression, index) {
+      var subScope = {};
+      subScope[repeatExpression.paramName] = data[index];
+      subScope.$index = index;
+      subScope.$key = repeatExpression.paramName;
+      return subScope;
+    },
 
+
+
+
+    _updateList: function (listNode, changes) {
+
+      var index;
       var children;
+      var node;
+      var repeatData = listNode.$$repeatData;
+
+      console.log(changes);
+
+      changes.forEach(function (change) {
+
+        switch (change.type) {
+
+          case "add":
+            index = parseInt(change.name, 10);
+            if (index >= 0) {
+              node = repeatData.itemTemplate.cloneNode(true);
+              this._render(node,  this._buildSubScope(repeatData.data, repeatData.expr, index));
+              if(index > 0) {
+                Template.insertAfter(node, Template.getChildren(listNode)[index-1]);
+              } else {
+                listNode.appendChild(node);
+              }
+            }
+          break;
+
+          case "delete":
+            index = parseInt(change.name, 10);
+            if (index >= 0) {
+              var toRemove = Template.getChildren(listNode)[index];
+              toRemove.parentNode.removeChild(toRemove);
+            }
+          break;
+
+          case "update":
+            index = parseInt(change.name, 10);
+            if (index >= 0) {
+              node = repeatData.itemTemplate.cloneNode(true);
+              this._render(node,  this._buildSubScope(repeatData.data, repeatData.expr, index));
+              var toReplace = Template.getChildren(listNode)[index];
+              toReplace.parentNode.replaceChild(node, toReplace);
+            }
+          break;
+
+        }
+
+      }, this);
+
+    },
+
+
+    _render : function (node, scope) {
+
       if (node.hasAttribute && node.hasAttribute("data-bind")) {
         scopeName = node.getAttribute("data-bind");
         node.removeAttribute("data-bind");
         scope = scope[scopeName];
+        this._currentPath += "." + scopeName;
       }
 
       var repeatAttr = null;
+      var children;
+
       if (node.hasAttribute && node.hasAttribute("data-repeat")) {
         repeatAttr = node.getAttribute("data-repeat");
         node.removeAttribute("data-repeat");
@@ -337,40 +512,52 @@ export default (function () {
       if (repeatAttr) {
 
         var repeatExpression = this._parseRepeatExpression(repeatAttr);
-        var data = this._getPathValue(scope, repeatExpression.expr);
+
+        var data = Template._getPathValue(scope, repeatExpression.expr);
+
+        // Observe the list Model to update the dom when changes happen
+        Object.observe(data, this._updateList.bind(this, node));
+
+        this._currentPath += "." + repeatExpression.expr;
+
         if (data === undefined) {
           console.error(repeatExpression.expr + " does'nt exists on " + scope);
           return;
         }
         var l = data.length;
         var fragments = [];
+
         children = Array.prototype.slice.call(node.childNodes);
-        var fragement = document.createDocumentFragment();
+
+        var fragment = document.createDocumentFragment();
         children.forEach(function (child) {
-          fragement.appendChild(child);
+          fragment.appendChild(child);
         });
-        fragments.push(fragement);
-        var loop = function (child) {
-          fragement.appendChild(child.cloneNode(true));
+
+        node.$$repeatData = {
+          itemTemplate: fragment.cloneNode(true),
+          data: data,
+          expr: repeatExpression
         };
-        for (var i = 1; i < l; i++) {
+
+        for (var i = 0; i < l; i++) {
           var subScope = null;
-          fragement = document.createDocumentFragment();
-          children.forEach(loop);
-          fragments.push(fragement);
+          fragments.push(fragment.cloneNode(true));
         }
 
-        fragments.forEach(function (fragement, index) {
-          var subScope = {};
-          subScope[repeatExpression.paramName] = data[index];
-          subScope.$index = index;
-          subScope.$key = repeatExpression.paramName;
-          this._render(fragement, subScope);
-          node.appendChild(fragement);
+        var listFragment = document.createDocumentFragment();
+
+        fragments.forEach(function (fragment, index) {
+          this._render(fragment, this._buildSubScope(data, repeatExpression, index));
+          listFragment.appendChild(fragment);
         }.bind(this));
 
+        node.appendChild(listFragment);
+
       } else {
+
         children = Array.prototype.slice.call(node.childNodes);
+
         children.forEach(function (child) {
           if (child.nodeType == Template.NODE_TYPE.TEXT) {
             this._renderTextNode(child, scope);
@@ -379,6 +566,7 @@ export default (function () {
             this._render(child, scope);
           }
         }.bind(this));
+
       }
     }
   };
@@ -401,8 +589,9 @@ export default (function () {
 
     template: function (model, ctx) {
       var template = Template.create(this[0], model, ctx);
-      Object.observe(model, Template.applyChanges.bind(this, template, model));
-      return this;
+      //Object.observe(model, Template.applyChanges.bind(this, template, model));
+      Object.observe(model, template._onModelChange.bind(template));
+      return template;
     }
 
   };
