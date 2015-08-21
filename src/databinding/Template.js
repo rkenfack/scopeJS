@@ -3,8 +3,8 @@ TODO : Partial rendering for Conditions
 conditions could also be function calls
 */
 
-
 import Logger from "src/modules/Logger";
+import utils from "src/utils/Utils";
 
 export default (function () {
 
@@ -189,21 +189,49 @@ export default (function () {
 
     _listeners: [],
 
-    _modelListeners: {},
+    _modelListeners: [],
 
-    _onModelChange: function _onModelChange(changes) {
-      var that = this;
-      changes.forEach(function (change) {
-        var listeners = that._modelListeners[change.name];
-        if (listeners) {
-          listeners.forEach(function (listener) {
-            listener.callback(that, change);
-          });
+
+    _findObjectListener: function (obj) {
+      var found = null;
+      for (var i = 0; i < this._modelListeners.length; i++) {
+        if (utils.equals(this._modelListeners[i].obj, obj)) {
+          found = this._modelListeners[i];
+          break;
         }
-      });
+      }
+      return found;
     },
 
-    dispose: function dispose() {
+    observeObject: function (obj, listener) {
+
+      var modelListener = this._findObjectListener(obj);
+
+      if (modelListener === null) {
+
+        var globalListener = function(modelListener, changes) {
+          modelListener.listeners.forEach(function (listener) {
+            listener(changes);
+          });
+        };
+
+        modelListener = {
+          obj: obj,
+          globalListener : globalListener,
+          listeners: [listener]
+        };
+        this._modelListeners.push(modelListener);
+
+        Object.observe(obj, globalListener.bind(this, modelListener));
+
+      } else {
+        modelListener.listeners.push(listener);
+      }
+    },
+
+
+    dispose: function () {
+      this._unobserve();
       this._removeListeners();
       var node = this._node;
       var parent = node.parentNode;
@@ -211,7 +239,7 @@ export default (function () {
       delete this._node.$$template;
     },
 
-    update: function update(model) {
+    update: function (model) {
       var node = this._node;
       var parent = node.parentNode;
       var oldNode = node;
@@ -227,14 +255,22 @@ export default (function () {
       return instance;
     },
 
-    _removeListeners: function _removeListeners() {
+
+    _unobserve : function() {
+      this._modelListeners.forEach(function(observed) {
+        Object.unobserve(observed.obj, observed.globalListener);
+      });
+    },
+
+
+    _removeListeners: function () {
       this._listeners.forEach(function (registered) {
         registered.node.removeEventListener(registered.eventName, registered.listener, false);
       });
       this._listeners = [];
     },
 
-    _isEventSupported: function _isEventSupported(target, eventName) {
+    _isEventSupported: function (target, eventName) {
       eventName = "on" + eventName;
       var isSupported = (eventName in target);
       if (!isSupported) {
@@ -245,7 +281,7 @@ export default (function () {
       return isSupported;
     },
 
-    _getExpressions: function _getExpressions(value) {
+    _getExpressions: function (value) {
       var expressions = [];
       var test = value.match(Template.regex.token) || [];
       test.forEach((function (match) {
@@ -254,11 +290,10 @@ export default (function () {
           paramName: match.match(Template.regex.paramName)[0].trim()
         });
       }).bind(this));
-
       return expressions;
     },
 
-    _parseRepeatExpression: function _parseRepeatExpression(value) {
+    _parseRepeatExpression: function (value) {
       var expression = null;
       var test = value.match(Template.regex.repeat);
       if (test) {
@@ -270,7 +305,7 @@ export default (function () {
       return expression;
     },
 
-    _renderTextNode: function _renderTextNode(node, scope) {
+    _renderTextNode: function (node, scope) {
 
       var originalNode = node.cloneNode(true);
       var expressions = this._getExpressions(originalNode.textContent);
@@ -279,28 +314,25 @@ export default (function () {
       var val = null;
 
       if (expressions.length > 0) {
-
         expressions.forEach(function (expression) {
-
           val = scope[expression.paramName];
-
           if (val !== undefined) {
-            Object.observe(scope, (function (changes) {
+            this.observeObject(scope, function (changes) {
               changes.forEach(function (change) {
                 node.textContent = this._renderText(originalNode.cloneNode(true).textContent, scope);
               }, this);
-            }).bind(this));
+            }.bind(this));
           } else {
             var parts = expression.paramName.split(".");
             if (parts.length > 1) {
               parts.splice(-1);
               if (pathToObserve !== parts.join(".")) {
                 toObserve = Template._getPathValue(scope, parts.join("."));
-                Object.observe(toObserve, (function (changes) {
+                this.observeObject(toObserve, function (changes) {
                   changes.forEach(function (change) {
                     node.textContent = this._renderText(originalNode.cloneNode(true).textContent, scope);
                   }, this);
-                }).bind(this));
+                }.bind(this));
               }
               pathToObserve = parts.join(".");
             }
@@ -310,7 +342,7 @@ export default (function () {
       node.textContent = this._renderText(node.textContent, scope);
     },
 
-    _renderText: function _renderText(text, scope) {
+    _renderText: function (text, scope) {
       if (text.length > 0) {
         var expressions = this._getExpressions(text);
         expressions.forEach((function (expression) {
@@ -321,7 +353,7 @@ export default (function () {
       return "";
     },
 
-    _getParamList: function _getParamList(scope, funcString) {
+    _getParamList: function (scope, funcString) {
       var startPos = funcString.indexOf("(");
       var endPos = funcString.indexOf(")");
       var funcName = funcString.substr(0, startPos);
@@ -339,7 +371,7 @@ export default (function () {
       };
     },
 
-    _callFunction: function _callFunction(funcString, args) {
+    _callFunction: function (funcString, args) {
       return (function () {
         var ref = this;
         var parts = funcString.split(".");
@@ -347,7 +379,7 @@ export default (function () {
           if (ref[parts[i]] !== undefined) {
             ref = ref[parts[i]];
           } else {
-            throw "The function " + funcString + " is not defined";
+            Logger.warn("The function " + funcString + " is not defined");
           }
         }
         return function (e) {
@@ -357,7 +389,7 @@ export default (function () {
       }).bind(this._ctx)();
     },
 
-    _updateAttr: function _updateAttr(scope, expression, originalNode, refNode, changes) {
+    _updateAttr: function (scope, expression, originalNode, refNode, changes) {
       var nodeName = this._renderText(originalNode.name, scope);
       changes.forEach(function (change) {
         var attrValue = originalNode.value.replace(expression.templExp, Template._getPathValue(scope, expression.paramName));
@@ -373,7 +405,7 @@ export default (function () {
       }
     },
 
-    _applyCondition: function _applyCondition(refNode, node, scope) {
+    _applyCondition: function (refNode, node, scope) {
 
       var newstr = node.value.replace(/{/g, "").replace(/}/g, "");
       var conditionValue = Template.executeCode(newstr, scope);
@@ -390,7 +422,7 @@ export default (function () {
           // Observe changes for partial rendering
           var val = scope[varr];
           if (val !== undefined) {
-            Object.observe(scope, function (changes) {
+            this.observeObject(scope, function (changes) {
               conditionValue = Template.executeCode(originalNode.cloneNode(true).value.replace(/{/g, "").replace(/}/g, ""), scope);
             });
           } else {
@@ -398,14 +430,14 @@ export default (function () {
             if (parts.length > 1) {
               parts.splice(-1);
               var toObserve = parts.join(".");
-              Object.observe(Template._getPathValue(scope, toObserve), function (changes) {
+              this.observeObject(Template._getPathValue(scope, toObserve), function (changes) {
                 conditionValue = Template.executeCode(originalNode.cloneNode(true).value.replace(/{/g, "").replace(/}/g, ""), scope);
               });
             }
           }
-        });
+        }, this);
 
-      })(refNode, node, scope);
+      }.bind(this))(refNode, node, scope);
 
 
       var show = true;
@@ -431,11 +463,11 @@ export default (function () {
     },
 
 
-    _renderAttributeNode: function _renderAttributeNode(refNode, node, scope) {
+    _renderAttributeNode: function (refNode, node, scope) {
 
       var attrValue = node.value;
       var nodeName = this._renderText(node.name, scope);
-      var originalNode = node/*.cloneNode(true)*/;
+      var originalNode = node;
 
       var removedAttr = false;
 
@@ -479,13 +511,13 @@ export default (function () {
             // Observe changes for partial rendering
             var val = scope[expression.paramName];
             if (val !== undefined) {
-              Object.observe(scope, this._updateAttr.bind(this, scope, expression, originalNode, refNode));
+              this.observeObject(scope, this._updateAttr.bind(this, scope, expression, originalNode, refNode));
             } else {
               parts = expression.paramName.split(".");
               if (parts.length > 1) {
                 parts.splice(-1);
                 var toObserve = parts.join(".");
-                Object.observe(Template._getPathValue(scope, toObserve), this._updateAttr.bind(this, scope, expression, originalNode, refNode));
+                this.observeObject(Template._getPathValue(scope, toObserve), this._updateAttr.bind(this, scope, expression, originalNode, refNode));
               }
             }
 
@@ -518,7 +550,7 @@ export default (function () {
       return true;
     },
 
-    _renderAttributes: function _renderAttributes(node, scope) {
+    _renderAttributes: function (node, scope) {
       var attrs = node.attributes;
       var res = true;
       if (attrs && attrs.length > 0) {
@@ -530,7 +562,7 @@ export default (function () {
       return res;
     },
 
-    _buildSubScope: function _buildSubScope(data, repeatExpression, index) {
+    _buildSubScope: function (data, repeatExpression, index) {
       var subScope = {};
       subScope[repeatExpression.paramName] = data[index];
       subScope.$index = index;
@@ -538,7 +570,7 @@ export default (function () {
       return subScope;
     },
 
-    _updateList: function _updateList(listNode, changes) {
+    _updateList: function (listNode, changes) {
 
       var index;
       var children;
@@ -584,7 +616,7 @@ export default (function () {
       }, this);
     },
 
-    _render: function _render(node, scope) {
+    _render: function (node, scope) {
 
       if (node.hasAttribute && node.hasAttribute("data-bind")) {
         scopeName = node.getAttribute("data-bind");
@@ -618,7 +650,7 @@ export default (function () {
         }
 
         // Observe the list Model to update the dom when changes happen
-        Object.observe(data, this._updateList.bind(this, node));
+        this.observeObject(data, this._updateList.bind(this, node));
 
         this._currentPath += "." + repeatExpression.expr;
 
@@ -684,10 +716,7 @@ export default (function () {
     removeSpecial: Template.removeSpecial,
 
     template: function (model, ctx) {
-      var template = Template.create(this[0], model, ctx);
-      //Object.observe(model, Template.applyChanges.bind(this, template, model));
-      Object.observe(model, template._onModelChange.bind(template));
-      return template;
+      return Template.create(this[0], model, ctx);
     }
 
   };

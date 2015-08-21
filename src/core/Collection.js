@@ -79,7 +79,7 @@ Collection.create = function(htmlString) {
 Collection.addModule = function(module, override) {
   for(var name in module) {
     if(((Collection.prototype[name] !== undefined) || (Array.prototype[name] !== undefined)) && (override !== true)) {
-      Logger.error("Method '" + name + "' already available.");
+      Logger.warn("Method '" + name + "' already available.");
     } else {
       Collection.prototype[name] = module[name];
     }
@@ -99,7 +99,7 @@ Collection.addModule = function(module, override) {
 Collection.addStaticModule = function(module, override) {
   for(var name in module) {
     if((this[name] !== undefined) && (override !== true)) {
-      Logger.error("Method '" + name + "' already available as static method.");
+      Logger.warn("Method '" + name + "' already available as static method.");
     } else {
       this[name] = module[name];
     }
