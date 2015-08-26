@@ -6,6 +6,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
 
   grunt.initConfig({
@@ -60,6 +61,16 @@ module.exports = function (grunt) {
         src: ['src/resources/objectobserve.min.js', 'dist/<%= pkg.name %>-min.js'],
         dest: 'dist/<%= pkg.name %>-min.js'
       }
+    },
+
+    watch: {
+      scripts: {
+        files: 'src/**/*.js',
+        tasks: ['build'],
+        options: {
+          debounceDelay: 250,
+        },
+      },
     }
 
   });

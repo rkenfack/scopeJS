@@ -15,6 +15,7 @@ export default (function () {
       instance: this,
       ctx: ctx
     };
+    this._model = scope;
     this._ctx = ctx;
     this._node = node;
     this._currentPath = "";
@@ -26,24 +27,6 @@ export default (function () {
     ATTR: 2,
     TEXT: 3,
     DOCUMENT_FRAGMENT: 11
-  };
-
-  Template.applyChanges = function (template, model, changes) {
-
-    var firstCharCode = null;
-    var keysArray = _Object$keys(Object(model));
-    var changeCount = 0;
-
-    for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
-      var nextKey = keysArray[nextIndex];
-      if (nextKey.toLowerCase().charAt(0) != "_" && nextKey.toLowerCase().charAt(0) != "$") {
-        changeCount++;
-      }
-    }
-
-    if (changeCount > 0) {
-      template.update(model);
-    }
   };
 
   Template.verySpecials = ["checked", "multiple", "readonly", "disabled"];
@@ -63,6 +46,12 @@ export default (function () {
     }
   };
 
+  Template.cloneAttrNode = function (attrNode) {
+    var clone = document.createAttribute(attrNode.name);
+    clone.value = attrNode.value;
+    return clone;
+  };
+
   Template.addSpecial = function (attrName, mapTo) {
     Template.specials[attrName] = mapTo;
   };
@@ -78,13 +67,22 @@ export default (function () {
   };
 
   Template.executeCode = function (code, scope) {
+
     return (function (codeToRun) {
+
       var vars = codeToRun.match(Template.regex.varName);
-      var parts;
+
+      var pathValue;
+
       vars.forEach(function (vr) {
-        codeToRun = codeToRun.replace(vr, Template._getPathValue(scope, vr));
-      });
+        pathValue = Template._getPathValue.call(this, scope, vr);
+        pathValue = typeof pathValue == "object" ? true : pathValue;
+        if (pathValue !== undefined) {
+          codeToRun = codeToRun.replace(vr, pathValue);
+        }
+      }, this);
       codeToRun = "'use strict'; return " + codeToRun;
+
       try {
         var tmpFunc = new Function(codeToRun); // jshint ignore:line
         return tmpFunc.apply({});
@@ -93,7 +91,9 @@ export default (function () {
         Logger.warn("The expression " + code + " could not be evaluated !");
       }
       return false;
-    })(code);
+
+    }.bind(this))(code);
+
   };
 
   Template.escapeHtml = function (str) {
@@ -128,27 +128,39 @@ export default (function () {
     string: /^(\"|\')(.*)(\"|\')$/
   };
 
-  Template._getPathValue = function (obj, path) {
+  Template._getPathValue = function (scope, path) {
 
-    var parts = path.split(".");
-    var res = obj;
-
-    if (parts.length == 1) {
-      if (typeof obj[path] !== undefined) {
-        res = obj[path];
-      }
-    } else {
-      for (var i = 0; i < parts.length; i++) {
-        res = res[parts[i]];
-        if (res === undefined) {
-          res = obj;
-          break;
+    var getPathValue = function (namespace, path) {
+      var parts = path.split(".");
+      var res;
+      if (parts.length == 1) {
+        if (typeof namespace[path] !== undefined) {
+          res = namespace[path];
+        }
+      } else {
+        res = namespace;
+        for (var i = 0; i < parts.length; i++) {
+          res = res[parts[i]];
+          if (res === undefined) {
+            break;
+          }
         }
       }
+      return res;
+    };
+
+    var value = getPathValue(scope, path);
+    if (value === undefined) {
+      value = getPathValue(this._model, path);
+    }
+    if (value === undefined) {
+      value = getPathValue(window, path);
     }
 
-    return res;
+    return value;
+
   };
+
 
   Template.getChildren = function (list) {
     var children = Array.prototype.slice.call(list.childNodes);
@@ -209,7 +221,7 @@ export default (function () {
 
       if (modelListener === null) {
 
-        var globalListener = function(modelListener, changes) {
+        var globalListener = function (modelListener, changes) {
           modelListener.listeners.forEach(function (listener) {
             listener(changes);
           });
@@ -217,7 +229,7 @@ export default (function () {
 
         modelListener = {
           obj: obj,
-          globalListener : globalListener,
+          globalListener: globalListener,
           listeners: [listener]
         };
         this._modelListeners.push(modelListener);
@@ -240,6 +252,7 @@ export default (function () {
     },
 
     update: function (model) {
+      this._model = model;
       var node = this._node;
       var parent = node.parentNode;
       var oldNode = node;
@@ -256,8 +269,8 @@ export default (function () {
     },
 
 
-    _unobserve : function() {
-      this._modelListeners.forEach(function(observed) {
+    _unobserve: function () {
+      this._modelListeners.forEach(function (observed) {
         Object.unobserve(observed.obj, observed.globalListener);
       });
     },
@@ -327,7 +340,7 @@ export default (function () {
             if (parts.length > 1) {
               parts.splice(-1);
               if (pathToObserve !== parts.join(".")) {
-                toObserve = Template._getPathValue(scope, parts.join("."));
+                toObserve = Template._getPathValue.call(this, scope, parts.join("."));
                 this.observeObject(toObserve, function (changes) {
                   changes.forEach(function (change) {
                     node.textContent = this._renderText(originalNode.cloneNode(true).textContent, scope);
@@ -346,7 +359,7 @@ export default (function () {
       if (text.length > 0) {
         var expressions = this._getExpressions(text);
         expressions.forEach((function (expression) {
-          text = text.replace(expression.templExp, Template._getPathValue(scope, expression.paramName));
+          text = text.replace(expression.templExp, Template._getPathValue.call(this, scope, expression.paramName));
         }).bind(this));
         return text;
       }
@@ -360,8 +373,10 @@ export default (function () {
       var params = funcString.substr(startPos + 1, endPos - startPos - 1).trim();
       if (params.length > 0) {
         params = params.split(",").map((function (param) {
-          return Template._getPathValue(scope, param.trim());
-        }).bind(this));
+          return Template._getPathValue.call(this, scope, param.trim());
+        }).bind(this)).filter(function (p) {
+          return p !== undefined;
+        });
       } else {
         params = [];
       }
@@ -371,28 +386,46 @@ export default (function () {
       };
     },
 
-    _callFunction: function (funcString, args) {
+    _callFunction : function (funcString, args, scope) {
+
       return (function () {
-        var ref = this;
+
         var parts = funcString.split(".");
+        var isFunctionDefined = true;
+        var context = scope[parts[0]] ? scope : (this._model[parts[0]] ? this._model : window);
+        context = context || this._model[parts[0]];
+        context = context || window[parts[0]];
+        var ref = context;
+
         for (var i = 0; i < parts.length; i++) {
           if (ref[parts[i]] !== undefined) {
             ref = ref[parts[i]];
           } else {
+            isFunctionDefined = false;
             Logger.warn("The function " + funcString + " is not defined");
+            break;
           }
         }
-        return function (e) {
-          args.push(e);
-          ref.apply(this, args);
-        };
-      }).bind(this._ctx)();
+
+        if (isFunctionDefined) {
+          return function (e) {
+            args.push(e);
+            ref.apply(context, args);
+          };
+        } else {
+          return function () {
+            Logger.warn("The function " + funcString + " is not defined");
+          };
+        }
+
+      }.bind(this))();
+
     },
 
     _updateAttr: function (scope, expression, originalNode, refNode, changes) {
       var nodeName = this._renderText(originalNode.name, scope);
       changes.forEach(function (change) {
-        var attrValue = originalNode.value.replace(expression.templExp, Template._getPathValue(scope, expression.paramName));
+        var attrValue = originalNode.value.replace(expression.templExp, Template._getPathValue.call(this, scope, expression.paramName));
         refNode.setAttribute(nodeName, attrValue);
       }, this);
     },
@@ -405,16 +438,43 @@ export default (function () {
       }
     },
 
+    processCondition : function(refNode, condition, conditionValue, originalRefNode) {
+
+      if(["data-show", "data-hide"].indexOf(condition) != -1) {
+
+        if(condition == "data-show") {
+          if(conditionValue === true) {
+            refNode.classList.remove("scope-hide");
+          } else {
+            refNode.classList.add("scope-hide");
+          }
+        } else {
+          if(conditionValue === true) {
+            refNode.classList.add("scope-hide");
+          } else {
+            refNode.classList.remove("scope-hide");
+          }
+        }
+
+      } else if(condition == "data-if") {
+
+      }
+
+    },
+
+
     _applyCondition: function (refNode, node, scope) {
 
       var newstr = node.value.replace(/{/g, "").replace(/}/g, "");
-      var conditionValue = Template.executeCode(newstr, scope);
+      var conditionValue = Template.executeCode.call(this, newstr, scope);
       var expressions = this._getExpressions(node.value);
 
-      var originalNode = node.cloneNode(true);
+      var originalNode = Template.cloneAttrNode(node);
       var originalRefNode = refNode.cloneNode(true);
 
-      (function (refNode, node, scope) {
+      this.processCondition(refNode, node.name, conditionValue, originalRefNode);
+
+      (function (that, refNode, node, scope) {
 
         var vars = newstr.match(Template.regex.varName);
 
@@ -422,44 +482,26 @@ export default (function () {
           // Observe changes for partial rendering
           var val = scope[varr];
           if (val !== undefined) {
-            this.observeObject(scope, function (changes) {
-              conditionValue = Template.executeCode(originalNode.cloneNode(true).value.replace(/{/g, "").replace(/}/g, ""), scope);
+            that.observeObject(scope, function (changes) {
+              conditionValue = Template.executeCode.call(that, Template.cloneAttrNode(originalNode).value.replace(/{/g, "").replace(/}/g, ""), scope);
+              that.processCondition(refNode, originalNode.name, conditionValue, originalRefNode);
             });
           } else {
             var parts = varr.split(".");
             if (parts.length > 1) {
-              parts.splice(-1);
-              var toObserve = parts.join(".");
-              this.observeObject(Template._getPathValue(scope, toObserve), function (changes) {
-                conditionValue = Template.executeCode(originalNode.cloneNode(true).value.replace(/{/g, "").replace(/}/g, ""), scope);
-              });
+              if(scope[parts[0]] !== undefined) {
+                parts.splice(-1);
+                var toObserve = parts.join(".");
+                that.observeObject(Template._getPathValue.call(that, scope, toObserve), function (changes) {
+                  conditionValue = Template.executeCode.call(that, Template.cloneAttrNode(originalNode).value.replace(/{/g, "").replace(/}/g, ""), scope);
+                  that.processCondition(refNode, originalNode.name, conditionValue, originalRefNode);
+                });
+              }
             }
           }
-        }, this);
+        });
 
-      }.bind(this))(refNode, node, scope);
-
-
-      var show = true;
-      var res = true;
-
-      switch (node.name) {
-      case "data-if":
-        this._toggleNodeRemove(refNode, originalRefNode, conditionValue);
-        res = false;
-        break;
-      case "data-show":
-        show = conditionValue;
-        break;
-      case "data-hide":
-        show = !conditionValue;
-        break;
-      }
-
-      var display = show ? "block" : "none";
-      refNode.style.display = display;
-
-      return res;
+      })(this, refNode, node, scope);
     },
 
 
@@ -480,10 +522,9 @@ export default (function () {
           var eventName = parts[1];
           var callback = attrValue;
           refNode.removeAttribute(node.name);
-
           var funcCall = this._getParamList(scope, callback);
           if (funcCall.funcName.trim().length > 0) {
-            callback = this._callFunction(funcCall.funcName, funcCall.params);
+            callback = this._callFunction(funcCall.funcName, funcCall.params, scope);
             this._listeners.push({
               node: refNode,
               eventName: eventName,
@@ -517,11 +558,11 @@ export default (function () {
               if (parts.length > 1) {
                 parts.splice(-1);
                 var toObserve = parts.join(".");
-                this.observeObject(Template._getPathValue(scope, toObserve), this._updateAttr.bind(this, scope, expression, originalNode, refNode));
+                this.observeObject(Template._getPathValue.call(this, scope, toObserve), this._updateAttr.bind(this, scope, expression, originalNode, refNode));
               }
             }
 
-            attrValue = attrValue.replace(expression.templExp, Template._getPathValue(scope, expression.paramName));
+            attrValue = attrValue.replace(expression.templExp, Template._getPathValue.call(this, scope, expression.paramName));
           }).bind(this));
         }
       }
@@ -642,7 +683,7 @@ export default (function () {
 
         var repeatExpression = this._parseRepeatExpression(repeatAttr);
 
-        var data = Template._getPathValue(scope, repeatExpression.expr);
+        var data = Template._getPathValue.call(this, scope, repeatExpression.expr);
 
         if (data === undefined) {
           Logger.debug(repeatExpression.expr + " does'nt exists on " + scope);
