@@ -8,6 +8,9 @@
 // http://casperjs.org/
 // https://github.com/Fyrd/caniuse
 
+//TODO: Implements conditions as functions (data-show. data-hide, data-if)
+//TODO: Fix ciclic references
+
 import windowPolyfills from "src/polyfill/Window";
 import polyfill from "src/polyfill/Object";
 import dataset from "src/polyfill/Dataset";

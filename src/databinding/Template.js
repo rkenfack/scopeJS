@@ -438,7 +438,7 @@ export default (function () {
       }
     },
 
-    processCondition : function(refNode, condition, conditionValue, originalRefNode) {
+    processCondition : function(scope, refNode, condition, conditionValue, originalRefNode, previousSibling, nextSibling, parent) {
 
       if(["data-show", "data-hide"].indexOf(condition) != -1) {
 
@@ -458,6 +458,23 @@ export default (function () {
 
       } else if(condition == "data-if") {
 
+        if(conditionValue === false) {
+          if(refNode.parentNode) {
+            refNode.parentNode.removeChild(refNode);
+          }
+        } else {
+          if(!refNode.parentNode) {
+            if(nextSibling) {
+              nextSibling.parentNode.insertBefore(originalRefNode, nextSibling);
+            } else if(previousSibling) {
+              Template.insertAfter(originalRefNode, previousSibling);
+            } else {
+              parent.appendChild(originalRefNode);
+            }
+            this._render(originalRefNode, scope);
+          }
+        }
+
       }
 
     },
@@ -472,7 +489,11 @@ export default (function () {
       var originalNode = Template.cloneAttrNode(node);
       var originalRefNode = refNode.cloneNode(true);
 
-      this.processCondition(refNode, node.name, conditionValue, originalRefNode);
+      var refParent = refNode.parentNode;
+      var refNextSibling = refNode.nextSibling;
+      var refPreviousSibling = refNode.previousSibling;
+
+      this.processCondition(scope, refNode, node.name, conditionValue, originalRefNode, refPreviousSibling, refNextSibling, refParent);
 
       (function (that, refNode, node, scope) {
 
@@ -484,7 +505,7 @@ export default (function () {
           if (val !== undefined) {
             that.observeObject(scope, function (changes) {
               conditionValue = Template.executeCode.call(that, Template.cloneAttrNode(originalNode).value.replace(/{/g, "").replace(/}/g, ""), scope);
-              that.processCondition(refNode, originalNode.name, conditionValue, originalRefNode);
+              that.processCondition(scope, refNode, originalNode.name, conditionValue, originalRefNode, refPreviousSibling, refNextSibling, refParent);
             });
           } else {
             var parts = varr.split(".");
@@ -494,7 +515,7 @@ export default (function () {
                 var toObserve = parts.join(".");
                 that.observeObject(Template._getPathValue.call(that, scope, toObserve), function (changes) {
                   conditionValue = Template.executeCode.call(that, Template.cloneAttrNode(originalNode).value.replace(/{/g, "").replace(/}/g, ""), scope);
-                  that.processCondition(refNode, originalNode.name, conditionValue, originalRefNode);
+                  that.processCondition(scope, refNode, originalNode.name, conditionValue, originalRefNode, refPreviousSibling, refNextSibling, refParent);
                 });
               }
             }
