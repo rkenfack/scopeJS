@@ -110,6 +110,9 @@ Collection.addStaticModule = function(module, override) {
 Collection.addModule(clazz);
 Collection.addModule(style);
 Collection.addModule(traversing);
+Collection.addModule({
+	find : traversing.find
+}, true);
 Collection.addModule(dimension);
 Collection.addModule(events);
 Collection.addModule(manipulation);

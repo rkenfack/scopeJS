@@ -149,15 +149,15 @@ class XHR extends Notifier {
       this.setUrl(uriUtils.appendParamsToUrl(this.getUrl(), {
         nocache: new Date().valueOf()
       }));
-    }
-
-    // set timeout
-    if (curTimeout) {
-      xhr.timeout = curTimeout;
-    }
+    }    
 
     // initialize request
     xhr.open(this.getMethod(), this.getUrl(), this.__async);
+	
+	// set timeout
+    if (curTimeout) {	
+      xhr.timeout = curTimeout;
+    }
 
     // set all previously stored headers on initialized request
     for (var key in this.__requestHeaders) {

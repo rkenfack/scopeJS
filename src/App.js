@@ -1,9 +1,8 @@
 /**
-  Browser support : IE9, Chrome , Firefox
-  @version 0.0.1
-  @author Romeo Kenfack Tsakem
-*/
-
+ *  Browser support : IE9, Chrome , Firefox
+ *  @version 0.0.1
+ *  @author Romeo Kenfack Tsakem
+ */
 
 // http://casperjs.org/
 // https://github.com/Fyrd/caniuse

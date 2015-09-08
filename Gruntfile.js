@@ -54,11 +54,11 @@ module.exports = function (grunt) {
         separator: grunt.util.linefeed,
       },
       source: {
-        src: ['src/resources/objectobserve.min.js', 'dist/<%= pkg.name %>.js'],
+        src: ['dist/<%= pkg.name %>.js', 'src/resources/objectobserve.min.js'],
         dest: 'dist/<%= pkg.name %>.js'
       },
       min : {
-        src: ['src/resources/objectobserve.min.js', 'dist/<%= pkg.name %>-min.js'],
+        src: ['dist/<%= pkg.name %>-min.js', 'src/resources/objectobserve.min.js'],
         dest: 'dist/<%= pkg.name %>-min.js'
       }
     },

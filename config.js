@@ -1,22 +1,20 @@
 System.config({
-  "baseURL": "./",
-  "transpiler": "babel",
-  "babelOptions": {
+  baseURL: "./",
+  defaultJSExtensions: true,
+  transpiler: "babel",
+  babelOptions: {
     "comments": true,
     "stage": 0,
     "optional": [
       "runtime"
     ]
   },
-  "paths": {
-    "*": "*.js",
-    "github:*": "jspm_packages/github/*.js",
-    "npm:*": "jspm_packages/npm/*.js"
-  }
-});
+  paths: {
+    "github:*": "jspm_packages/github/*",
+    "npm:*": "jspm_packages/npm/*"
+  },
 
-System.config({
-  "map": {
+  map: {
     "babel": "npm:babel-core@5.4.7",
     "babel-runtime": "npm:babel-runtime@5.4.7",
     "chai": "npm:chai@3.0.0",
@@ -72,11 +70,6 @@ System.config({
     },
     "npm:babel-runtime@5.4.7": {
       "core-js": "npm:core-js@0.9.13"
-    },
-    "npm:buffer@3.2.2": {
-      "base64-js": "npm:base64-js@0.0.8",
-      "ieee754": "npm:ieee754@1.1.6",
-      "is-array": "npm:is-array@1.0.1"
     },
     "npm:buffer@3.3.0": {
       "base64-js": "npm:base64-js@0.0.8",
@@ -152,10 +145,8 @@ System.config({
       "inherits": "npm:inherits@2.0.1",
       "isarray": "npm:isarray@0.0.1",
       "process": "github:jspm/nodelibs-process@0.1.1",
-      "stream": "github:jspm/nodelibs-stream@0.1.0",
       "stream-browserify": "npm:stream-browserify@1.0.0",
-      "string_decoder": "npm:string_decoder@0.10.31",
-      "util": "github:jspm/nodelibs-util@0.1.0"
+      "string_decoder": "npm:string_decoder@0.10.31"
     },
     "npm:source-map@0.4.2": {
       "amdefine": "npm:amdefine@0.1.1",
@@ -183,4 +174,3 @@ System.config({
     }
   }
 });
-

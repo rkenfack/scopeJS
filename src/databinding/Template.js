@@ -134,7 +134,7 @@ export default (function () {
       var parts = path.split(".");
       var res;
       if (parts.length == 1) {
-        if (typeof namespace[path] !== undefined) {
+        if (typeof namespace[path] !== undefined) {			
           res = namespace[path];
         }
       } else {
@@ -146,6 +146,7 @@ export default (function () {
           }
         }
       }
+	  res = typeof namespace[path] == "function" ? namespace[path]() : namespace[path];
       return res;
     };
 
