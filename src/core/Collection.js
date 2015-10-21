@@ -5,6 +5,7 @@ import clazz from "src/css/Class";
 import style from "src/css/Style";
 import dimension from "src/css/Dimension";
 import traversing from "src/core/Traversing";
+import attributes from "src/core/Attribute";
 import events from "src/event/Event";
 import Logger from "src/modules/Logger";
 import manipulation from "src/core/Manipulation";
@@ -110,6 +111,7 @@ Collection.addStaticModule = function(module, override) {
 Collection.addModule(clazz);
 Collection.addModule(style);
 Collection.addModule(traversing);
+Collection.addModule(attributes);
 Collection.addModule({
 	find : traversing.find
 }, true);

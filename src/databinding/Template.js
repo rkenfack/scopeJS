@@ -387,7 +387,7 @@ export default (function () {
       };
     },
 
-    _callFunction : function (funcString, args, scope) {
+    _callFunction : function (funcString, args, scope, refNode) {
 
       return (function () {
 
@@ -407,6 +407,8 @@ export default (function () {
             break;
           }
         }
+		
+		    context = context == window ? refNode : context;
 
         if (isFunctionDefined) {
           return function (e) {
@@ -496,6 +498,7 @@ export default (function () {
 
       this.processCondition(scope, refNode, node.name, conditionValue, originalRefNode, refPreviousSibling, refNextSibling, refParent);
 
+      // Observe changes to any part of the condition
       (function (that, refNode, node, scope) {
 
         var vars = newstr.match(Template.regex.varName);
@@ -524,6 +527,8 @@ export default (function () {
         });
 
       })(this, refNode, node, scope);
+
+
     },
 
 
@@ -546,7 +551,7 @@ export default (function () {
           refNode.removeAttribute(node.name);
           var funcCall = this._getParamList(scope, callback);
           if (funcCall.funcName.trim().length > 0) {
-            callback = this._callFunction(funcCall.funcName, funcCall.params, scope);
+            callback = this._callFunction(funcCall.funcName, funcCall.params, scope, refNode);
             this._listeners.push({
               node: refNode,
               eventName: eventName,

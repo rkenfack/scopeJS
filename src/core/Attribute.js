@@ -68,20 +68,20 @@ export default (function() {
 
 
     setAttribute: function(attrName, attrValue) {
-      if (this[0]) {
-        setAttribute(this[0], attrName, attrValue);
-      }
+	  this.forEach(function(el) {
+		setAttribute(el, attrName, attrValue);
+	  });      
       return this;
     },
 
 
     setAttributes: function(attrsMap) {
-      if (this[0]) {
-        for (var attrName in attrsMap) {
-          setAttribute(this[0], attrName, attrsMap[attrName]);
-        }
-      }
-      return this;
+		this.forEach(function(el) {
+			for (var attrName in attrsMap) {
+				setAttribute(el, attrName, attrsMap[attrName]);
+			}
+		});      
+		return this;
     },
 
 
@@ -94,9 +94,9 @@ export default (function() {
 
 
     setProperty: function(propName, propValue) {
-      if (this[0]) {
-        return setProperty(this[0], propName, propValue);
-      }
+	  this.forEach(function(el) {
+		setProperty(el, propName, propValue);
+	  });      
       return this;
     },
 
@@ -113,13 +113,14 @@ export default (function() {
 
 
     setProperties: function(propsMap) {
-      if (this[0]) {
-        for (var propName in propsMap) {
-          setProperty(this[0], propName, propsMap[propName]);
+	  this.forEach(function(el) {
+	    for (var propName in propsMap) {
+          setProperty(el, propName, propsMap[propName]);
         }
-      }
+	  });      
       return this;
     },
+	
 
     dataset : function() {
       if(this[0]) {
