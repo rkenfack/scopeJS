@@ -68,20 +68,20 @@ export default (function() {
 
 
     setAttribute: function(attrName, attrValue) {
-	  this.forEach(function(el) {
-		setAttribute(el, attrName, attrValue);
+	    this.forEach(function(el) {
+		  setAttribute(el, attrName, attrValue);
 	  });      
       return this;
     },
 
 
     setAttributes: function(attrsMap) {
-		this.forEach(function(el) {
-			for (var attrName in attrsMap) {
-				setAttribute(el, attrName, attrsMap[attrName]);
-			}
-		});      
-		return this;
+		  this.forEach(function(el) {
+			  for (var attrName in attrsMap) {
+				  setAttribute(el, attrName, attrsMap[attrName]);
+			  }
+		  });      
+		  return this;
     },
 
 
@@ -94,8 +94,8 @@ export default (function() {
 
 
     setProperty: function(propName, propValue) {
-	  this.forEach(function(el) {
-		setProperty(el, propName, propValue);
+	    this.forEach(function(el) {
+		  setProperty(el, propName, propValue);
 	  });      
       return this;
     },
@@ -113,11 +113,11 @@ export default (function() {
 
 
     setProperties: function(propsMap) {
-	  this.forEach(function(el) {
-	    for (var propName in propsMap) {
+	    this.forEach(function(el) {
+	      for (var propName in propsMap) {
           setProperty(el, propName, propsMap[propName]);
         }
-	  });      
+	    });      
       return this;
     },
 	

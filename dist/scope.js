@@ -152,7 +152,14 @@
 
     var declaration = entry.declare.call(global, function(name, value) {
       module.locked = true;
-      exports[name] = value;
+
+      if (typeof name == 'object') {
+        for (var p in name)
+          exports[p] = name[p];
+      }
+      else {
+        exports[name] = value;
+      }
 
       for (var i = 0, l = module.importers.length; i < l; i++) {
         var importerModule = module.importers[i];
@@ -346,6 +353,10 @@
     if (modules[name])
       return modules[name];
 
+    // node core modules
+    if (name.substr(0, 6) == '@node/')
+      return require(name.substr(6));
+
     var entry = defined[name];
 
     // first we check if this module has already been defined in the registry
@@ -433,7 +444,7 @@
   // etc UMD / module pattern
 })*/
 
-(['0', '1'], [], function($__System) {
+(['1', '2', '3', '4'], [], function($__System) {
 
 (function(__global) {
   var loader = $__System;
@@ -555,19 +566,7 @@
 
 })(typeof self != 'undefined' ? self : global);
 
-$__System.registerDynamic("1", [], false, function(__require, __exports, __module) {
-  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
-  (function() {
-    (function() {
-      if (scope && scope.Logger) {
-        scope.Logger.enableAll();
-      }
-    })();
-  })();
-  return _retrieveGlobal();
-});
-
-$__System.registerDynamic("2", [], false, function(__require, __exports, __module) {
+$__System.registerDynamic("5", [], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     (function() {
@@ -598,7 +597,100 @@ $__System.registerDynamic("2", [], false, function(__require, __exports, __modul
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("4", [], false, function(__require, __exports, __module) {
+$__System.register('6', [], function (_export) {
+  'use strict';
+
+  return {
+    setters: [],
+    execute: function () {
+      _export('default', (function () {
+
+        if (!window.Object.assign) {
+
+          Object.defineProperty(window.Object, 'assign', {
+            enumerable: false,
+            configurable: true,
+            writable: true,
+            value: function value(target, firstSource) {
+              'use strict';
+              if (target === undefined || target === null) {
+                throw new TypeError('Cannot convert first argument to object');
+              }
+              var to = window.Object(target);
+              for (var i = 1; i < arguments.length; i++) {
+                var nextSource = arguments[i];
+                if (nextSource === undefined || nextSource === null) {
+                  continue;
+                }
+                nextSource = window.Object(nextSource);
+
+                var keysArray = window.Object.keys(window.Object(nextSource));
+                for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
+                  var nextKey = keysArray[nextIndex];
+                  var desc = window.Object.getOwnPropertyDescriptor(nextSource, nextKey);
+                  if (desc !== undefined && desc.enumerable) {
+                    to[nextKey] = nextSource[nextKey];
+                  }
+                }
+              }
+              return to;
+            }
+          });
+        }
+
+        if (!window.Object.keys) {
+          window.Object.keys = (function () {
+            'use strict';
+            var hasOwnProperty = Object.prototype.hasOwnProperty,
+                hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
+                dontEnums = ['toString', 'toLocaleString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'constructor'],
+                dontEnumsLength = dontEnums.length;
+
+            return function (obj) {
+              if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
+                throw new TypeError('Object.keys called on non-object');
+              }
+
+              var result = [],
+                  prop,
+                  i;
+
+              for (prop in obj) {
+                if (hasOwnProperty.call(obj, prop)) {
+                  result.push(prop);
+                }
+              }
+
+              if (hasDontEnumBug) {
+                for (i = 0; i < dontEnumsLength; i++) {
+                  if (hasOwnProperty.call(obj, dontEnums[i])) {
+                    result.push(dontEnums[i]);
+                  }
+                }
+              }
+              return result;
+            };
+          })();
+        }
+
+        if (!window.Object.values) {
+
+          window.Object.values = (function (obj) {
+            'use strict';
+            return function (obj) {
+              var values = [];
+              window.Object.keys(obj).forEach(function (key, index) {
+                values[index] = obj[key];
+              });
+              return values;
+            };
+          })();
+        }
+      })());
+    }
+  };
+});
+$__System.registerDynamic("7", [], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     if (!("dataset" in document.createElement("_"))) {
@@ -678,7 +770,271 @@ $__System.registerDynamic("4", [], false, function(__require, __exports, __modul
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("7", [], false, function(__require, __exports, __module) {
+$__System.register('8', [], function (_export) {
+  'use strict';
+
+  return {
+    setters: [],
+    execute: function () {
+      _export('default', (function () {
+
+        try {
+          new CustomEvent('?');
+        } catch (o_O) {
+          /*!(C) Andrea Giammarchi -- WTFPL License*/
+          this.CustomEvent = (function (eventName, defaultInitDict) {
+
+            // the infamous substitute
+            function CustomEvent(type, eventInitDict) {
+              var event = document.createEvent(eventName);
+              if (type !== null) {
+                initCustomEvent.call(event, type, (eventInitDict || (
+                // if falsy we can just use defaults
+                eventInitDict = defaultInitDict)).bubbles, eventInitDict.cancelable, eventInitDict.detail);
+              } else {
+                // no need to put the expando property otherwise
+                // since an event cannot be initialized twice
+                // previous case is the most common one anyway
+                // but if we end up here ... there it goes
+                event.initCustomEvent = initCustomEvent;
+              }
+              return event;
+            }
+
+            // borrowed or attached at runtime
+            function initCustomEvent(type, bubbles, cancelable, detail) {
+              this['init' + eventName](type, bubbles, cancelable, detail);
+              if (!('detail' in this)) {
+                this.detail = detail;
+              }
+            }
+
+            // that's it
+            return CustomEvent;
+          })(
+          // is this IE9 or IE10 ?
+          // where CustomEvent is there
+          // but not usable as construtor ?
+          this.CustomEvent ?
+          // use the CustomEvent interface in such case
+          'CustomEvent' : 'Event',
+          // otherwise the common compatible one
+          {
+            bubbles: false,
+            cancelable: false,
+            detail: null
+          });
+        }
+      }).bind(window)());
+    }
+  };
+});
+$__System.register('9', [], function (_export) {
+  'use strict';
+
+  return {
+    setters: [],
+    execute: function () {
+      _export('default', (function (root) {
+
+        // Use polyfill for setImmediate for performance gains
+        var asap = typeof setImmediate === 'function' && setImmediate || function (fn) {
+          setTimeout(fn, 1);
+        };
+
+        // Polyfill for Function.prototype.bind
+        function bind(fn, thisArg) {
+          return function () {
+            fn.apply(thisArg, arguments);
+          };
+        }
+
+        var isArray = Array.isArray || function (value) {
+          return Object.prototype.toString.call(value) === "[object Array]";
+        };
+
+        function Promise(fn) {
+          if (typeof this !== 'object') throw new TypeError('Promises must be constructed via new');
+          if (typeof fn !== 'function') throw new TypeError('not a function');
+          this._state = null;
+          this._value = null;
+          this._deferreds = [];
+
+          doResolve(fn, bind(resolve, this), bind(reject, this));
+        }
+
+        function handle(deferred) {
+          var me = this;
+          if (this._state === null) {
+            this._deferreds.push(deferred);
+            return;
+          }
+          asap(function () {
+            var cb = me._state ? deferred.onFulfilled : deferred.onRejected;
+            if (cb === null) {
+              (me._state ? deferred.resolve : deferred.reject)(me._value);
+              return;
+            }
+            var ret;
+            try {
+              ret = cb(me._value);
+            } catch (e) {
+              deferred.reject(e);
+              return;
+            }
+            deferred.resolve(ret);
+          });
+        }
+
+        function resolve(newValue) {
+          try {
+            //Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+            if (newValue === this) throw new TypeError('A promise cannot be resolved with itself.');
+            if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+              var then = newValue.then;
+              if (typeof then === 'function') {
+                doResolve(bind(then, newValue), bind(resolve, this), bind(reject, this));
+                return;
+              }
+            }
+            this._state = true;
+            this._value = newValue;
+            finale.call(this);
+          } catch (e) {
+            reject.call(this, e);
+          }
+        }
+
+        function reject(newValue) {
+          this._state = false;
+          this._value = newValue;
+          finale.call(this);
+        }
+
+        function finale() {
+          for (var i = 0, len = this._deferreds.length; i < len; i++) {
+            handle.call(this, this._deferreds[i]);
+          }
+          this._deferreds = null;
+        }
+
+        function Handler(onFulfilled, onRejected, resolve, reject) {
+          this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+          this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+          this.resolve = resolve;
+          this.reject = reject;
+        }
+
+        /**
+         * Take a potentially misbehaving resolver function and make sure
+         * onFulfilled and onRejected are only called once.
+         *
+         * Makes no guarantees about asynchrony.
+         */
+        function doResolve(fn, onFulfilled, onRejected) {
+          var done = false;
+          try {
+            fn(function (value) {
+              if (done) return;
+              done = true;
+              onFulfilled(value);
+            }, function (reason) {
+              if (done) return;
+              done = true;
+              onRejected(reason);
+            });
+          } catch (ex) {
+            if (done) return;
+            done = true;
+            onRejected(ex);
+          }
+        }
+
+        Promise.prototype['catch'] = function (onRejected) {
+          return this.then(null, onRejected);
+        };
+
+        Promise.prototype.then = function (onFulfilled, onRejected) {
+          var me = this;
+          return new Promise(function (resolve, reject) {
+            handle.call(me, new Handler(onFulfilled, onRejected, resolve, reject));
+          });
+        };
+
+        Promise.all = function () {
+          var args = Array.prototype.slice.call(arguments.length === 1 && isArray(arguments[0]) ? arguments[0] : arguments);
+
+          return new Promise(function (resolve, reject) {
+            if (args.length === 0) return resolve([]);
+            var remaining = args.length;
+            function res(i, val) {
+              try {
+                if (val && (typeof val === 'object' || typeof val === 'function')) {
+                  var then = val.then;
+                  if (typeof then === 'function') {
+                    then.call(val, function (val) {
+                      res(i, val);
+                    }, reject);
+                    return;
+                  }
+                }
+                args[i] = val;
+                if (--remaining === 0) {
+                  resolve(args);
+                }
+              } catch (ex) {
+                reject(ex);
+              }
+            }
+            for (var i = 0; i < args.length; i++) {
+              res(i, args[i]);
+            }
+          });
+        };
+
+        Promise.resolve = function (value) {
+          if (value && typeof value === 'object' && value.constructor === Promise) {
+            return value;
+          }
+
+          return new Promise(function (resolve) {
+            resolve(value);
+          });
+        };
+
+        Promise.reject = function (value) {
+          return new Promise(function (resolve, reject) {
+            reject(value);
+          });
+        };
+
+        Promise.race = function (values) {
+          return new Promise(function (resolve, reject) {
+            for (var i = 0, len = values.length; i < len; i++) {
+              values[i].then(resolve, reject);
+            }
+          });
+        };
+
+        /**
+         * Set the immediate function to execute callbacks
+         * @param fn {function} Function to execute
+         * @private
+         */
+        Promise._setImmediateFn = function _setImmediateFn(fn) {
+          asap = fn;
+        };
+
+        if (typeof module !== 'undefined' && module.exports) {
+          module.exports = Promise;
+        } else if (!root.Promise) {
+          root.Promise = Promise;
+        }
+      })(window));
+    }
+  };
+});
+$__System.registerDynamic("a", [], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     !function(a, b) {
@@ -2821,124 +3177,34 @@ $__System.registerDynamic("7", [], false, function(__require, __exports, __modul
   return _retrieveGlobal();
 });
 
-$__System.registerDynamic("d", ["20"], true, function(require, exports, module) {
+$__System.registerDynamic("b", [], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
+  var $Object = Object;
   module.exports = {
-    "default": require("20"),
-    __esModule: true
+    create: $Object.create,
+    getProto: $Object.getPrototypeOf,
+    isEnum: {}.propertyIsEnumerable,
+    getDesc: $Object.getOwnPropertyDescriptor,
+    setDesc: $Object.defineProperty,
+    setDescs: $Object.defineProperties,
+    getKeys: $Object.keys,
+    getNames: $Object.getOwnPropertyNames,
+    getSymbols: $Object.getOwnPropertySymbols,
+    each: [].forEach
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("19", ["24"], true, function(require, exports, module) {
+$__System.registerDynamic("c", ["b"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
-  module.exports = {
-    "default": require("24"),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("1c", [], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  exports["default"] = function(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  };
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("1b", ["d"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var _Object$defineProperty = require("d")["default"];
-  exports["default"] = (function() {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor)
-          descriptor.writable = true;
-        _Object$defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-    return function(Constructor, protoProps, staticProps) {
-      if (protoProps)
-        defineProperties(Constructor.prototype, protoProps);
-      if (staticProps)
-        defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  })();
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("1e", ["28"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": require("28"),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("1f", ["29"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": require("29"),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("20", ["2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a");
-  module.exports = function defineProperty(it, key, desc) {
-    return $.setDesc(it, key, desc);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("24", ["2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a");
+  var $ = req('b');
   module.exports = function create(P, D) {
     return $.create(P, D);
   };
@@ -2946,3074 +3212,20 @@ $__System.registerDynamic("24", ["2a"], true, function(require, exports, module)
   return module.exports;
 });
 
-$__System.registerDynamic("26", ["19"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var _Object$create = require("19")["default"];
-  exports["default"] = function(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-    subClass.prototype = _Object$create(superClass && superClass.prototype, {constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }});
-    if (superClass)
-      subClass.__proto__ = superClass;
-  };
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("27", ["2c"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  "use strict";
-  var _Object$getOwnPropertyDescriptor = require("2c")["default"];
-  exports["default"] = function get(_x, _x2, _x3) {
-    var _again = true;
-    _function: while (_again) {
-      var object = _x,
-          property = _x2,
-          receiver = _x3;
-      desc = parent = getter = undefined;
-      _again = false;
-      var desc = _Object$getOwnPropertyDescriptor(object, property);
-      if (desc === undefined) {
-        var parent = Object.getPrototypeOf(object);
-        if (parent === null) {
-          return undefined;
-        } else {
-          _x = parent;
-          _x2 = property;
-          _x3 = receiver;
-          _again = true;
-          continue _function;
-        }
-      } else if ("value" in desc) {
-        return desc.value;
-      } else {
-        var getter = desc.get;
-        if (getter === undefined) {
-          return undefined;
-        }
-        return getter.call(receiver);
-      }
-    }
-  };
-  exports.__esModule = true;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("28", ["2d", "2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  require("2d");
-  module.exports = require("2a").core.Object.assign;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("29", ["2e", "2f", "30", "31", "2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  require("2e");
-  require("2f");
-  require("30");
-  require("31");
-  module.exports = require("2a").core.Promise;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2a", ["32"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  'use strict';
-  var global = typeof self != 'undefined' ? self : Function('return this')(),
-      core = {},
-      defineProperty = Object.defineProperty,
-      hasOwnProperty = {}.hasOwnProperty,
-      ceil = Math.ceil,
-      floor = Math.floor,
-      max = Math.max,
-      min = Math.min;
-  var DESC = !!function() {
-    try {
-      return defineProperty({}, 'a', {get: function() {
-          return 2;
-        }}).a == 2;
-    } catch (e) {}
-  }();
-  var hide = createDefiner(1);
-  function toInteger(it) {
-    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-  }
-  function desc(bitmap, value) {
-    return {
-      enumerable: !(bitmap & 1),
-      configurable: !(bitmap & 2),
-      writable: !(bitmap & 4),
-      value: value
-    };
-  }
-  function simpleSet(object, key, value) {
-    object[key] = value;
-    return object;
-  }
-  function createDefiner(bitmap) {
-    return DESC ? function(object, key, value) {
-      return $.setDesc(object, key, desc(bitmap, value));
-    } : simpleSet;
-  }
-  function isObject(it) {
-    return it !== null && (typeof it == 'object' || typeof it == 'function');
-  }
-  function isFunction(it) {
-    return typeof it == 'function';
-  }
-  function assertDefined(it) {
-    if (it == undefined)
-      throw TypeError("Can't call method on  " + it);
-    return it;
-  }
-  var $ = module.exports = require("32")({
-    g: global,
-    core: core,
-    html: global.document && document.documentElement,
-    isObject: isObject,
-    isFunction: isFunction,
-    that: function() {
-      return this;
-    },
-    toInteger: toInteger,
-    toLength: function(it) {
-      return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
-    },
-    toIndex: function(index, length) {
-      index = toInteger(index);
-      return index < 0 ? max(index + length, 0) : min(index, length);
-    },
-    has: function(it, key) {
-      return hasOwnProperty.call(it, key);
-    },
-    create: Object.create,
-    getProto: Object.getPrototypeOf,
-    DESC: DESC,
-    desc: desc,
-    getDesc: Object.getOwnPropertyDescriptor,
-    setDesc: defineProperty,
-    setDescs: Object.defineProperties,
-    getKeys: Object.keys,
-    getNames: Object.getOwnPropertyNames,
-    getSymbols: Object.getOwnPropertySymbols,
-    assertDefined: assertDefined,
-    ES5Object: Object,
-    toObject: function(it) {
-      return $.ES5Object(assertDefined(it));
-    },
-    hide: hide,
-    def: createDefiner(0),
-    set: global.Symbol ? simpleSet : hide,
-    each: [].forEach
-  });
-  if (typeof __e != 'undefined')
-    __e = core;
-  if (typeof __g != 'undefined')
-    __g = global;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2b", ["33"], true, function(require, exports, module) {
+$__System.registerDynamic("d", ["c"], true, function(req, exports, module) {
   ;
   var global = this,
       __define = global.define;
   global.define = undefined;
   module.exports = {
-    "default": require("33"),
+    "default": req('c'),
     __esModule: true
   };
   global.define = __define;
   return module.exports;
 });
 
-$__System.registerDynamic("2c", ["34"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = {
-    "default": require("34"),
-    __esModule: true
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2d", ["35", "36"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $def = require("35");
-  $def($def.S, 'Object', {assign: require("36")});
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2e", ["37", "38", "2a", "39"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  'use strict';
-  var cof = require("37"),
-      tmp = {};
-  tmp[require("38")('toStringTag')] = 'z';
-  if (require("2a").FW && cof(tmp) != 'z') {
-    require("39")(Object.prototype, 'toString', function toString() {
-      return '[object ' + cof.classof(this) + ']';
-    }, true);
-  }
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("2f", ["2a", "3a", "3b", "3c", "3d"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var set = require("2a").set,
-      $at = require("3a")(true),
-      ITER = require("3b").safe('iter'),
-      $iter = require("3c"),
-      step = $iter.step;
-  require("3d")(String, 'String', function(iterated) {
-    set(this, ITER, {
-      o: String(iterated),
-      i: 0
-    });
-  }, function() {
-    var iter = this[ITER],
-        O = iter.o,
-        index = iter.i,
-        point;
-    if (index >= O.length)
-      return step(1);
-    point = $at(O, index);
-    iter.i += point.length;
-    return step(0, point);
-  });
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("30", ["3e", "2a", "3c", "38"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  require("3e");
-  var $ = require("2a"),
-      Iterators = require("3c").Iterators,
-      ITERATOR = require("38")('iterator'),
-      ArrayValues = Iterators.Array,
-      NL = $.g.NodeList,
-      HTC = $.g.HTMLCollection,
-      NLProto = NL && NL.prototype,
-      HTCProto = HTC && HTC.prototype;
-  if ($.FW) {
-    if (NL && !(ITERATOR in NLProto))
-      $.hide(NLProto, ITERATOR, ArrayValues);
-    if (HTC && !(ITERATOR in HTCProto))
-      $.hide(HTCProto, ITERATOR, ArrayValues);
-  }
-  Iterators.NodeList = Iterators.HTMLCollection = ArrayValues;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("31", ["2a", "40", "37", "35", "41", "42", "43", "44", "38", "3b", "45", "46", "47", "3f"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  (function(process) {
-    'use strict';
-    var $ = require("2a"),
-        ctx = require("40"),
-        cof = require("37"),
-        $def = require("35"),
-        assert = require("41"),
-        forOf = require("42"),
-        setProto = require("43").set,
-        species = require("44"),
-        SPECIES = require("38")('species'),
-        RECORD = require("3b").safe('record'),
-        PROMISE = 'Promise',
-        global = $.g,
-        process = global.process,
-        asap = process && process.nextTick || require("45").set,
-        P = global[PROMISE],
-        isFunction = $.isFunction,
-        isObject = $.isObject,
-        assertFunction = assert.fn,
-        assertObject = assert.obj;
-    var useNative = function() {
-      var test,
-          works = false;
-      function P2(x) {
-        var self = new P(x);
-        setProto(self, P2.prototype);
-        return self;
-      }
-      try {
-        works = isFunction(P) && isFunction(P.resolve) && P.resolve(test = new P(function() {})) == test;
-        setProto(P2, P);
-        P2.prototype = $.create(P.prototype, {constructor: {value: P2}});
-        if (!(P2.resolve(5).then(function() {}) instanceof P2)) {
-          works = false;
-        }
-      } catch (e) {
-        works = false;
-      }
-      return works;
-    }();
-    function getConstructor(C) {
-      var S = assertObject(C)[SPECIES];
-      return S != undefined ? S : C;
-    }
-    function isThenable(it) {
-      var then;
-      if (isObject(it))
-        then = it.then;
-      return isFunction(then) ? then : false;
-    }
-    function notify(record) {
-      var chain = record.c;
-      if (chain.length)
-        asap(function() {
-          var value = record.v,
-              ok = record.s == 1,
-              i = 0;
-          function run(react) {
-            var cb = ok ? react.ok : react.fail,
-                ret,
-                then;
-            try {
-              if (cb) {
-                if (!ok)
-                  record.h = true;
-                ret = cb === true ? value : cb(value);
-                if (ret === react.P) {
-                  react.rej(TypeError('Promise-chain cycle'));
-                } else if (then = isThenable(ret)) {
-                  then.call(ret, react.res, react.rej);
-                } else
-                  react.res(ret);
-              } else
-                react.rej(value);
-            } catch (err) {
-              react.rej(err);
-            }
-          }
-          while (chain.length > i)
-            run(chain[i++]);
-          chain.length = 0;
-        });
-    }
-    function isUnhandled(promise) {
-      var record = promise[RECORD],
-          chain = record.a || record.c,
-          i = 0,
-          react;
-      if (record.h)
-        return false;
-      while (chain.length > i) {
-        react = chain[i++];
-        if (react.fail || !isUnhandled(react.P))
-          return false;
-      }
-      return true;
-    }
-    function $reject(value) {
-      var record = this,
-          promise;
-      if (record.d)
-        return;
-      record.d = true;
-      record = record.r || record;
-      record.v = value;
-      record.s = 2;
-      record.a = record.c.slice();
-      setTimeout(function() {
-        asap(function() {
-          if (isUnhandled(promise = record.p)) {
-            if (cof(process) == 'process') {
-              process.emit('unhandledRejection', value, promise);
-            } else if (global.console && isFunction(console.error)) {
-              console.error('Unhandled promise rejection', value);
-            }
-          }
-          record.a = undefined;
-        });
-      }, 1);
-      notify(record);
-    }
-    function $resolve(value) {
-      var record = this,
-          then,
-          wrapper;
-      if (record.d)
-        return;
-      record.d = true;
-      record = record.r || record;
-      try {
-        if (then = isThenable(value)) {
-          wrapper = {
-            r: record,
-            d: false
-          };
-          then.call(value, ctx($resolve, wrapper, 1), ctx($reject, wrapper, 1));
-        } else {
-          record.v = value;
-          record.s = 1;
-          notify(record);
-        }
-      } catch (err) {
-        $reject.call(wrapper || {
-          r: record,
-          d: false
-        }, err);
-      }
-    }
-    if (!useNative) {
-      P = function Promise(executor) {
-        assertFunction(executor);
-        var record = {
-          p: assert.inst(this, P, PROMISE),
-          c: [],
-          a: undefined,
-          s: 0,
-          d: false,
-          v: undefined,
-          h: false
-        };
-        $.hide(this, RECORD, record);
-        try {
-          executor(ctx($resolve, record, 1), ctx($reject, record, 1));
-        } catch (err) {
-          $reject.call(record, err);
-        }
-      };
-      require("46")(P.prototype, {
-        then: function then(onFulfilled, onRejected) {
-          var S = assertObject(assertObject(this).constructor)[SPECIES];
-          var react = {
-            ok: isFunction(onFulfilled) ? onFulfilled : true,
-            fail: isFunction(onRejected) ? onRejected : false
-          };
-          var promise = react.P = new (S != undefined ? S : P)(function(res, rej) {
-            react.res = assertFunction(res);
-            react.rej = assertFunction(rej);
-          });
-          var record = this[RECORD];
-          record.c.push(react);
-          if (record.a)
-            record.a.push(react);
-          record.s && notify(record);
-          return promise;
-        },
-        'catch': function(onRejected) {
-          return this.then(undefined, onRejected);
-        }
-      });
-    }
-    $def($def.G + $def.W + $def.F * !useNative, {Promise: P});
-    cof.set(P, PROMISE);
-    species(P);
-    species($.core[PROMISE]);
-    $def($def.S + $def.F * !useNative, PROMISE, {
-      reject: function reject(r) {
-        return new (getConstructor(this))(function(res, rej) {
-          rej(r);
-        });
-      },
-      resolve: function resolve(x) {
-        return isObject(x) && RECORD in x && $.getProto(x) === this.prototype ? x : new (getConstructor(this))(function(res) {
-          res(x);
-        });
-      }
-    });
-    $def($def.S + $def.F * !(useNative && require("47")(function(iter) {
-      P.all(iter)['catch'](function() {});
-    })), PROMISE, {
-      all: function all(iterable) {
-        var C = getConstructor(this),
-            values = [];
-        return new C(function(res, rej) {
-          forOf(iterable, false, values.push, values);
-          var remaining = values.length,
-              results = Array(remaining);
-          if (remaining)
-            $.each.call(values, function(promise, index) {
-              C.resolve(promise).then(function(value) {
-                results[index] = value;
-                --remaining || res(results);
-              }, rej);
-            });
-          else
-            res(results);
-        });
-      },
-      race: function race(iterable) {
-        var C = getConstructor(this);
-        return new C(function(res, rej) {
-          forOf(iterable, false, function(promise) {
-            C.resolve(promise).then(res, rej);
-          });
-        });
-      }
-    });
-  })(require("3f"));
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("32", [], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function($) {
-    $.FW = false;
-    $.path = $.core;
-    return $;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("33", ["48", "2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  require("48");
-  module.exports = require("2a").core.Object.values;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("34", ["2a", "49"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a");
-  require("49");
-  module.exports = function getOwnPropertyDescriptor(it, key) {
-    return $.getDesc(it, key);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("35", ["2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      global = $.g,
-      core = $.core,
-      isFunction = $.isFunction;
-  function ctx(fn, that) {
-    return function() {
-      return fn.apply(that, arguments);
-    };
-  }
-  $def.F = 1;
-  $def.G = 2;
-  $def.S = 4;
-  $def.P = 8;
-  $def.B = 16;
-  $def.W = 32;
-  function $def(type, name, source) {
-    var key,
-        own,
-        out,
-        exp,
-        isGlobal = type & $def.G,
-        isProto = type & $def.P,
-        target = isGlobal ? global : type & $def.S ? global[name] : (global[name] || {}).prototype,
-        exports = isGlobal ? core : core[name] || (core[name] = {});
-    if (isGlobal)
-      source = name;
-    for (key in source) {
-      own = !(type & $def.F) && target && key in target;
-      if (own && key in exports)
-        continue;
-      out = own ? target[key] : source[key];
-      if (isGlobal && !isFunction(target[key]))
-        exp = source[key];
-      else if (type & $def.B && own)
-        exp = ctx(out, global);
-      else if (type & $def.W && target[key] == out)
-        !function(C) {
-          exp = function(param) {
-            return this instanceof C ? new C(param) : C(param);
-          };
-          exp.prototype = C.prototype;
-        }(out);
-      else
-        exp = isProto && isFunction(out) ? ctx(Function.call, out) : out;
-      exports[key] = exp;
-      if (isProto)
-        (exports.prototype || (exports.prototype = {}))[key] = out;
-    }
-  }
-  module.exports = $def;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("36", ["2a", "4a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      enumKeys = require("4a");
-  module.exports = Object.assign || function assign(target, source) {
-    var T = Object($.assertDefined(target)),
-        l = arguments.length,
-        i = 1;
-    while (l > i) {
-      var S = $.ES5Object(arguments[i++]),
-          keys = enumKeys(S),
-          length = keys.length,
-          j = 0,
-          key;
-      while (length > j)
-        T[key = keys[j++]] = S[key];
-    }
-    return T;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("38", ["2a", "4b", "3b"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var global = require("2a").g,
-      store = require("4b")('wks');
-  module.exports = function(name) {
-    return store[name] || (store[name] = global.Symbol && global.Symbol[name] || require("3b").safe('Symbol.' + name));
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("37", ["2a", "38"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      TAG = require("38")('toStringTag'),
-      toString = {}.toString;
-  function cof(it) {
-    return toString.call(it).slice(8, -1);
-  }
-  cof.classof = function(it) {
-    var O,
-        T;
-    return it == undefined ? it === undefined ? 'Undefined' : 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : cof(O);
-  };
-  cof.set = function(it, tag, stat) {
-    if (it && !$.has(it = stat ? it : it.prototype, TAG))
-      $.hide(it, TAG, tag);
-  };
-  module.exports = cof;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("39", ["2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = require("2a").hide;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("3a", ["2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a");
-  module.exports = function(TO_STRING) {
-    return function(that, pos) {
-      var s = String($.assertDefined(that)),
-          i = $.toInteger(pos),
-          l = s.length,
-          a,
-          b;
-      if (i < 0 || i >= l)
-        return TO_STRING ? '' : undefined;
-      a = s.charCodeAt(i);
-      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-    };
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("3c", ["2a", "37", "41", "38", "4b"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  'use strict';
-  var $ = require("2a"),
-      cof = require("37"),
-      assertObject = require("41").obj,
-      SYMBOL_ITERATOR = require("38")('iterator'),
-      FF_ITERATOR = '@@iterator',
-      Iterators = require("4b")('iterators'),
-      IteratorPrototype = {};
-  setIterator(IteratorPrototype, $.that);
-  function setIterator(O, value) {
-    $.hide(O, SYMBOL_ITERATOR, value);
-    if (FF_ITERATOR in [])
-      $.hide(O, FF_ITERATOR, value);
-  }
-  module.exports = {
-    BUGGY: 'keys' in [] && !('next' in [].keys()),
-    Iterators: Iterators,
-    step: function(done, value) {
-      return {
-        value: value,
-        done: !!done
-      };
-    },
-    is: function(it) {
-      var O = Object(it),
-          Symbol = $.g.Symbol,
-          SYM = Symbol && Symbol.iterator || FF_ITERATOR;
-      return SYM in O || SYMBOL_ITERATOR in O || $.has(Iterators, cof.classof(O));
-    },
-    get: function(it) {
-      var Symbol = $.g.Symbol,
-          ext = it[Symbol && Symbol.iterator || FF_ITERATOR],
-          getIter = ext || it[SYMBOL_ITERATOR] || Iterators[cof.classof(it)];
-      return assertObject(getIter.call(it));
-    },
-    set: setIterator,
-    create: function(Constructor, NAME, next, proto) {
-      Constructor.prototype = $.create(proto || IteratorPrototype, {next: $.desc(1, next)});
-      cof.set(Constructor, NAME + ' Iterator');
-    }
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("3b", ["2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var sid = 0;
-  function uid(key) {
-    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++sid + Math.random()).toString(36));
-  }
-  uid.safe = require("2a").g.Symbol || uid;
-  module.exports = uid;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("3d", ["35", "39", "2a", "37", "3c", "38"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $def = require("35"),
-      $redef = require("39"),
-      $ = require("2a"),
-      cof = require("37"),
-      $iter = require("3c"),
-      SYMBOL_ITERATOR = require("38")('iterator'),
-      FF_ITERATOR = '@@iterator',
-      KEYS = 'keys',
-      VALUES = 'values',
-      Iterators = $iter.Iterators;
-  module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE) {
-    $iter.create(Constructor, NAME, next);
-    function createMethod(kind) {
-      function $$(that) {
-        return new Constructor(that, kind);
-      }
-      switch (kind) {
-        case KEYS:
-          return function keys() {
-            return $$(this);
-          };
-        case VALUES:
-          return function values() {
-            return $$(this);
-          };
-      }
-      return function entries() {
-        return $$(this);
-      };
-    }
-    var TAG = NAME + ' Iterator',
-        proto = Base.prototype,
-        _native = proto[SYMBOL_ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT],
-        _default = _native || createMethod(DEFAULT),
-        methods,
-        key;
-    if (_native) {
-      var IteratorPrototype = $.getProto(_default.call(new Base));
-      cof.set(IteratorPrototype, TAG, true);
-      if ($.FW && $.has(proto, FF_ITERATOR))
-        $iter.set(IteratorPrototype, $.that);
-    }
-    if ($.FW)
-      $iter.set(proto, _default);
-    Iterators[NAME] = _default;
-    Iterators[TAG] = $.that;
-    if (DEFAULT) {
-      methods = {
-        keys: IS_SET ? _default : createMethod(KEYS),
-        values: DEFAULT == VALUES ? _default : createMethod(VALUES),
-        entries: DEFAULT != VALUES ? _default : createMethod('entries')
-      };
-      if (FORCE)
-        for (key in methods) {
-          if (!(key in proto))
-            $redef(proto, key, methods[key]);
-        }
-      else
-        $def($def.P + $def.F * $iter.BUGGY, NAME, methods);
-    }
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("3e", ["2a", "4c", "3b", "3c", "3d"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      setUnscope = require("4c"),
-      ITER = require("3b").safe('iter'),
-      $iter = require("3c"),
-      step = $iter.step,
-      Iterators = $iter.Iterators;
-  require("3d")(Array, 'Array', function(iterated, kind) {
-    $.set(this, ITER, {
-      o: $.toObject(iterated),
-      i: 0,
-      k: kind
-    });
-  }, function() {
-    var iter = this[ITER],
-        O = iter.o,
-        kind = iter.k,
-        index = iter.i++;
-    if (!O || index >= O.length) {
-      iter.o = undefined;
-      return step(1);
-    }
-    if (kind == 'keys')
-      return step(0, index);
-    if (kind == 'values')
-      return step(0, O[index]);
-    return step(0, [index, O[index]]);
-  }, 'values');
-  Iterators.Arguments = Iterators.Array;
-  setUnscope('keys');
-  setUnscope('values');
-  setUnscope('entries');
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("3f", ["4d"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = require("4d");
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("40", ["41"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var assertFunction = require("41").fn;
-  module.exports = function(fn, that, length) {
-    assertFunction(fn);
-    if (~length && that === undefined)
-      return fn;
-    switch (length) {
-      case 1:
-        return function(a) {
-          return fn.call(that, a);
-        };
-      case 2:
-        return function(a, b) {
-          return fn.call(that, a, b);
-        };
-      case 3:
-        return function(a, b, c) {
-          return fn.call(that, a, b, c);
-        };
-    }
-    return function() {
-      return fn.apply(that, arguments);
-    };
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("41", ["2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a");
-  function assert(condition, msg1, msg2) {
-    if (!condition)
-      throw TypeError(msg2 ? msg1 + msg2 : msg1);
-  }
-  assert.def = $.assertDefined;
-  assert.fn = function(it) {
-    if (!$.isFunction(it))
-      throw TypeError(it + ' is not a function!');
-    return it;
-  };
-  assert.obj = function(it) {
-    if (!$.isObject(it))
-      throw TypeError(it + ' is not an object!');
-    return it;
-  };
-  assert.inst = function(it, Constructor, name) {
-    if (!(it instanceof Constructor))
-      throw TypeError(name + ": use the 'new' operator!");
-    return it;
-  };
-  module.exports = assert;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("42", ["40", "3c", "4e"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var ctx = require("40"),
-      get = require("3c").get,
-      call = require("4e");
-  module.exports = function(iterable, entries, fn, that) {
-    var iterator = get(iterable),
-        f = ctx(fn, that, entries ? 2 : 1),
-        step;
-    while (!(step = iterator.next()).done) {
-      if (call(iterator, f, step.value, entries) === false) {
-        return call.close(iterator);
-      }
-    }
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("43", ["2a", "41", "40"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      assert = require("41");
-  function check(O, proto) {
-    assert.obj(O);
-    assert(proto === null || $.isObject(proto), proto, ": can't set as prototype!");
-  }
-  module.exports = {
-    set: Object.setPrototypeOf || ('__proto__' in {} ? function(buggy, set) {
-      try {
-        set = require("40")(Function.call, $.getDesc(Object.prototype, '__proto__').set, 2);
-        set({}, []);
-      } catch (e) {
-        buggy = true;
-      }
-      return function setPrototypeOf(O, proto) {
-        check(O, proto);
-        if (buggy)
-          O.__proto__ = proto;
-        else
-          set(O, proto);
-        return O;
-      };
-    }() : undefined),
-    check: check
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("44", ["2a", "38"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      SPECIES = require("38")('species');
-  module.exports = function(C) {
-    if ($.DESC && !(SPECIES in C))
-      $.setDesc(C, SPECIES, {
-        configurable: true,
-        get: $.that
-      });
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("45", ["2a", "40", "37", "4f", "50", "3f"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  (function(process) {
-    'use strict';
-    var $ = require("2a"),
-        ctx = require("40"),
-        cof = require("37"),
-        invoke = require("4f"),
-        cel = require("50"),
-        global = $.g,
-        isFunction = $.isFunction,
-        html = $.html,
-        process = global.process,
-        setTask = global.setImmediate,
-        clearTask = global.clearImmediate,
-        postMessage = global.postMessage,
-        addEventListener = global.addEventListener,
-        MessageChannel = global.MessageChannel,
-        counter = 0,
-        queue = {},
-        ONREADYSTATECHANGE = 'onreadystatechange',
-        defer,
-        channel,
-        port;
-    function run() {
-      var id = +this;
-      if ($.has(queue, id)) {
-        var fn = queue[id];
-        delete queue[id];
-        fn();
-      }
-    }
-    function listner(event) {
-      run.call(event.data);
-    }
-    if (!isFunction(setTask) || !isFunction(clearTask)) {
-      setTask = function(fn) {
-        var args = [],
-            i = 1;
-        while (arguments.length > i)
-          args.push(arguments[i++]);
-        queue[++counter] = function() {
-          invoke(isFunction(fn) ? fn : Function(fn), args);
-        };
-        defer(counter);
-        return counter;
-      };
-      clearTask = function(id) {
-        delete queue[id];
-      };
-      if (cof(process) == 'process') {
-        defer = function(id) {
-          process.nextTick(ctx(run, id, 1));
-        };
-      } else if (addEventListener && isFunction(postMessage) && !global.importScripts) {
-        defer = function(id) {
-          postMessage(id, '*');
-        };
-        addEventListener('message', listner, false);
-      } else if (isFunction(MessageChannel)) {
-        channel = new MessageChannel;
-        port = channel.port2;
-        channel.port1.onmessage = listner;
-        defer = ctx(port.postMessage, port, 1);
-      } else if (ONREADYSTATECHANGE in cel('script')) {
-        defer = function(id) {
-          html.appendChild(cel('script'))[ONREADYSTATECHANGE] = function() {
-            html.removeChild(this);
-            run.call(id);
-          };
-        };
-      } else {
-        defer = function(id) {
-          setTimeout(ctx(run, id, 1), 0);
-        };
-      }
-    }
-    module.exports = {
-      set: setTask,
-      clear: clearTask
-    };
-  })(require("3f"));
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("46", ["39"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $redef = require("39");
-  module.exports = function(target, src) {
-    for (var key in src)
-      $redef(target, key, src[key]);
-    return target;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("47", ["38"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var SYMBOL_ITERATOR = require("38")('iterator'),
-      SAFE_CLOSING = false;
-  try {
-    var riter = [7][SYMBOL_ITERATOR]();
-    riter['return'] = function() {
-      SAFE_CLOSING = true;
-    };
-    Array.from(riter, function() {
-      throw 2;
-    });
-  } catch (e) {}
-  module.exports = function(exec) {
-    if (!SAFE_CLOSING)
-      return false;
-    var safe = false;
-    try {
-      var arr = [7],
-          iter = arr[SYMBOL_ITERATOR]();
-      iter.next = function() {
-        safe = true;
-      };
-      arr[SYMBOL_ITERATOR] = function() {
-        return iter;
-      };
-      exec(arr);
-    } catch (e) {}
-    return safe;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4a", ["2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a");
-  module.exports = function(it) {
-    var keys = $.getKeys(it),
-        getDesc = $.getDesc,
-        getSymbols = $.getSymbols;
-    if (getSymbols)
-      $.each.call(getSymbols(it), function(key) {
-        if (getDesc(it, key).enumerable)
-          keys.push(key);
-      });
-    return keys;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("48", ["2a", "35"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      $def = require("35");
-  function createObjectToArray(isEntries) {
-    return function(object) {
-      var O = $.toObject(object),
-          keys = $.getKeys(O),
-          length = keys.length,
-          i = 0,
-          result = Array(length),
-          key;
-      if (isEntries)
-        while (length > i)
-          result[i] = [key = keys[i++], O[key]];
-      else
-        while (length > i)
-          result[i] = O[keys[i++]];
-      return result;
-    };
-  }
-  $def($def.S, 'Object', {
-    values: createObjectToArray(false),
-    entries: createObjectToArray(true)
-  });
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("49", ["2a", "35"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      $def = require("35"),
-      isObject = $.isObject,
-      toObject = $.toObject;
-  $.each.call(('freeze,seal,preventExtensions,isFrozen,isSealed,isExtensible,' + 'getOwnPropertyDescriptor,getPrototypeOf,keys,getOwnPropertyNames').split(','), function(KEY, ID) {
-    var fn = ($.core.Object || {})[KEY] || Object[KEY],
-        forced = 0,
-        method = {};
-    method[KEY] = ID == 0 ? function freeze(it) {
-      return isObject(it) ? fn(it) : it;
-    } : ID == 1 ? function seal(it) {
-      return isObject(it) ? fn(it) : it;
-    } : ID == 2 ? function preventExtensions(it) {
-      return isObject(it) ? fn(it) : it;
-    } : ID == 3 ? function isFrozen(it) {
-      return isObject(it) ? fn(it) : true;
-    } : ID == 4 ? function isSealed(it) {
-      return isObject(it) ? fn(it) : true;
-    } : ID == 5 ? function isExtensible(it) {
-      return isObject(it) ? fn(it) : false;
-    } : ID == 6 ? function getOwnPropertyDescriptor(it, key) {
-      return fn(toObject(it), key);
-    } : ID == 7 ? function getPrototypeOf(it) {
-      return fn(Object($.assertDefined(it)));
-    } : ID == 8 ? function keys(it) {
-      return fn(toObject(it));
-    } : function getOwnPropertyNames(it) {
-      return fn(toObject(it));
-    };
-    try {
-      fn('z');
-    } catch (e) {
-      forced = 1;
-    }
-    $def($def.S + $def.F * forced, 'Object', method);
-  });
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4b", ["2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      SHARED = '__core-js_shared__',
-      store = $.g[SHARED] || $.hide($.g, SHARED, {})[SHARED];
-  module.exports = function(key) {
-    return store[key] || (store[key] = {});
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4c", ["2a", "38"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      UNSCOPABLES = require("38")('unscopables');
-  if ($.FW && !(UNSCOPABLES in []))
-    $.hide(Array.prototype, UNSCOPABLES, {});
-  module.exports = function(key) {
-    if ($.FW)
-      [][UNSCOPABLES][key] = true;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4d", ["51"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = $__System._nodeRequire ? process : require("51");
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4e", ["41"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var assertObject = require("41").obj;
-  function close(iterator) {
-    var ret = iterator['return'];
-    if (ret !== undefined)
-      assertObject(ret.call(iterator));
-  }
-  function call(iterator, fn, value, entries) {
-    try {
-      return entries ? fn(assertObject(value)[0], value[1]) : fn(value);
-    } catch (e) {
-      close(iterator);
-      throw e;
-    }
-  }
-  call.close = close;
-  module.exports = call;
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("4f", [], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = function(fn, args, that) {
-    var un = that === undefined;
-    switch (args.length) {
-      case 0:
-        return un ? fn() : fn.call(that);
-      case 1:
-        return un ? fn(args[0]) : fn.call(that, args[0]);
-      case 2:
-        return un ? fn(args[0], args[1]) : fn.call(that, args[0], args[1]);
-      case 3:
-        return un ? fn(args[0], args[1], args[2]) : fn.call(that, args[0], args[1], args[2]);
-      case 4:
-        return un ? fn(args[0], args[1], args[2], args[3]) : fn.call(that, args[0], args[1], args[2], args[3]);
-      case 5:
-        return un ? fn(args[0], args[1], args[2], args[3], args[4]) : fn.call(that, args[0], args[1], args[2], args[3], args[4]);
-    }
-    return fn.apply(that, args);
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("50", ["2a"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var $ = require("2a"),
-      document = $.g.document,
-      isObject = $.isObject,
-      is = isObject(document) && isObject(document.createElement);
-  module.exports = function(it) {
-    return is ? document.createElement(it) : {};
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("51", ["52"], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  module.exports = require("52");
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.registerDynamic("52", [], true, function(require, exports, module) {
-  ;
-  var global = this,
-      __define = global.define;
-  global.define = undefined;
-  var process = module.exports = {};
-  var queue = [];
-  var draining = false;
-  function drainQueue() {
-    if (draining) {
-      return;
-    }
-    draining = true;
-    var currentQueue;
-    var len = queue.length;
-    while (len) {
-      currentQueue = queue;
-      queue = [];
-      var i = -1;
-      while (++i < len) {
-        currentQueue[i]();
-      }
-      len = queue.length;
-    }
-    draining = false;
-  }
-  process.nextTick = function(fun) {
-    queue.push(fun);
-    if (!draining) {
-      setTimeout(drainQueue, 0);
-    }
-  };
-  process.title = 'browser';
-  process.browser = true;
-  process.env = {};
-  process.argv = [];
-  process.version = '';
-  process.versions = {};
-  function noop() {}
-  process.on = noop;
-  process.addListener = noop;
-  process.once = noop;
-  process.off = noop;
-  process.removeListener = noop;
-  process.removeAllListeners = noop;
-  process.emit = noop;
-  process.binding = function(name) {
-    throw new Error('process.binding is not supported');
-  };
-  process.cwd = function() {
-    return '/';
-  };
-  process.chdir = function(dir) {
-    throw new Error('process.chdir is not supported');
-  };
-  process.umask = function() {
-    return 0;
-  };
-  global.define = __define;
-  return module.exports;
-});
-
-$__System.register("0", ["2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c"], function (_export) {
-  /**
-   *  Browser support : IE9, Chrome , Firefox
-   *  @version 0.0.1
-   *  @author Romeo Kenfack Tsakem
-   */
-
-  // http://casperjs.org/
-  // https://github.com/Fyrd/caniuse
-
-  //TODO: Implements conditions as functions (data-show. data-hide, data-if)
-  //TODO: Fix ciclic references
-
-  "use strict";
-
-  var windowPolyfills, polyfill, dataset, customEvent, promise, webanimation, Collection, Observable, Router, xhr, Logger;
-  return {
-    setters: [function (_) {
-      windowPolyfills = _["default"];
-    }, function (_2) {
-      polyfill = _2["default"];
-    }, function (_3) {
-      dataset = _3["default"];
-    }, function (_4) {
-      customEvent = _4["default"];
-    }, function (_5) {
-      promise = _5["default"];
-    }, function (_6) {
-      webanimation = _6["default"];
-    }, function (_7) {
-      Collection = _7["default"];
-    }, function (_8) {
-      Observable = _8["default"];
-    }, function (_a) {
-      Router = _a["default"];
-    }, function (_b) {
-      xhr = _b["default"];
-    }, function (_c) {
-      Logger = _c["default"];
-    }],
-    execute: function () {
-      _export("default", (function () {
-
-        var scope = function scope(selector, ctx) {
-          return Collection.query(selector, ctx);
-        };
-
-        for (var module in Collection) {
-          if (Collection.hasOwnProperty(module)) {
-            if (typeof Collection[module] == "function") {
-              scope[module] = Collection[module].bind(scope);
-            } else {
-              scope[module] = Collection[module];
-            }
-          }
-        }
-
-        scope.addModule = Collection.addModule;
-
-        scope.addStaticModule(xhr);
-
-        scope.addStaticModule({
-          Router: Router.Router,
-          Logger: Logger,
-          Observable: Observable
-        });
-
-        var _scope = scope;
-
-        scope.noConflict = function () {
-          return _scope;
-        };
-
-        if (typeof window != "undefined") {
-          window.scope = window.$ = scope;
-        }
-
-        return scope;
-      })());
-    }
-  };
-});
-$__System.register('3', ['d'], function (_export) {
-  var _Object$defineProperty;
-
-  return {
-    setters: [function (_d) {
-      _Object$defineProperty = _d['default'];
-    }],
-    execute: function () {
-      'use strict';
-
-      _export('default', (function () {
-
-        if (!window.Object.assign) {
-
-          _Object$defineProperty(window.Object, 'assign', {
-            enumerable: false,
-            configurable: true,
-            writable: true,
-            value: function value(target, firstSource) {
-              'use strict';
-              if (target === undefined || target === null) {
-                throw new TypeError('Cannot convert first argument to object');
-              }
-              var to = window.Object(target);
-              for (var i = 1; i < arguments.length; i++) {
-                var nextSource = arguments[i];
-                if (nextSource === undefined || nextSource === null) {
-                  continue;
-                }
-                nextSource = window.Object(nextSource);
-
-                var keysArray = window.Object.keys(window.Object(nextSource));
-                for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
-                  var nextKey = keysArray[nextIndex];
-                  var desc = window.Object.getOwnPropertyDescriptor(nextSource, nextKey);
-                  if (desc !== undefined && desc.enumerable) {
-                    to[nextKey] = nextSource[nextKey];
-                  }
-                }
-              }
-              return to;
-            }
-          });
-        }
-
-        if (!window.Object.keys) {
-          window.Object.keys = (function () {
-            'use strict';
-            var hasOwnProperty = Object.prototype.hasOwnProperty,
-                hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
-                dontEnums = ['toString', 'toLocaleString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'constructor'],
-                dontEnumsLength = dontEnums.length;
-
-            return function (obj) {
-              if (typeof obj !== 'object' && (typeof obj !== 'function' || obj === null)) {
-                throw new TypeError('Object.keys called on non-object');
-              }
-
-              var result = [],
-                  prop,
-                  i;
-
-              for (prop in obj) {
-                if (hasOwnProperty.call(obj, prop)) {
-                  result.push(prop);
-                }
-              }
-
-              if (hasDontEnumBug) {
-                for (i = 0; i < dontEnumsLength; i++) {
-                  if (hasOwnProperty.call(obj, dontEnums[i])) {
-                    result.push(dontEnums[i]);
-                  }
-                }
-              }
-              return result;
-            };
-          })();
-        }
-
-        if (!window.Object.values) {
-
-          window.Object.values = (function (obj) {
-            'use strict';
-            return function (obj) {
-              var values = [];
-              window.Object.keys(obj).forEach(function (key, index) {
-                values[index] = obj[key];
-              });
-              return values;
-            };
-          })();
-        }
-      })());
-    }
-  };
-});
-$__System.register('6', [], function (_export) {
-  'use strict';
-
-  return {
-    setters: [],
-    execute: function () {
-      _export('default', (function (root) {
-
-        // Use polyfill for setImmediate for performance gains
-        var asap = typeof setImmediate === 'function' && setImmediate || function (fn) {
-          setTimeout(fn, 1);
-        };
-
-        // Polyfill for Function.prototype.bind
-        function bind(fn, thisArg) {
-          return function () {
-            fn.apply(thisArg, arguments);
-          };
-        }
-
-        var isArray = Array.isArray || function (value) {
-          return Object.prototype.toString.call(value) === '[object Array]';
-        };
-
-        function Promise(fn) {
-          if (typeof this !== 'object') throw new TypeError('Promises must be constructed via new');
-          if (typeof fn !== 'function') throw new TypeError('not a function');
-          this._state = null;
-          this._value = null;
-          this._deferreds = [];
-
-          doResolve(fn, bind(resolve, this), bind(reject, this));
-        }
-
-        function handle(deferred) {
-          var me = this;
-          if (this._state === null) {
-            this._deferreds.push(deferred);
-            return;
-          }
-          asap(function () {
-            var cb = me._state ? deferred.onFulfilled : deferred.onRejected;
-            if (cb === null) {
-              (me._state ? deferred.resolve : deferred.reject)(me._value);
-              return;
-            }
-            var ret;
-            try {
-              ret = cb(me._value);
-            } catch (e) {
-              deferred.reject(e);
-              return;
-            }
-            deferred.resolve(ret);
-          });
-        }
-
-        function resolve(newValue) {
-          try {
-            //Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
-            if (newValue === this) throw new TypeError('A promise cannot be resolved with itself.');
-            if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
-              var then = newValue.then;
-              if (typeof then === 'function') {
-                doResolve(bind(then, newValue), bind(resolve, this), bind(reject, this));
-                return;
-              }
-            }
-            this._state = true;
-            this._value = newValue;
-            finale.call(this);
-          } catch (e) {
-            reject.call(this, e);
-          }
-        }
-
-        function reject(newValue) {
-          this._state = false;
-          this._value = newValue;
-          finale.call(this);
-        }
-
-        function finale() {
-          for (var i = 0, len = this._deferreds.length; i < len; i++) {
-            handle.call(this, this._deferreds[i]);
-          }
-          this._deferreds = null;
-        }
-
-        function Handler(onFulfilled, onRejected, resolve, reject) {
-          this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
-          this.onRejected = typeof onRejected === 'function' ? onRejected : null;
-          this.resolve = resolve;
-          this.reject = reject;
-        }
-
-        /**
-         * Take a potentially misbehaving resolver function and make sure
-         * onFulfilled and onRejected are only called once.
-         *
-         * Makes no guarantees about asynchrony.
-         */
-        function doResolve(fn, onFulfilled, onRejected) {
-          var done = false;
-          try {
-            fn(function (value) {
-              if (done) return;
-              done = true;
-              onFulfilled(value);
-            }, function (reason) {
-              if (done) return;
-              done = true;
-              onRejected(reason);
-            });
-          } catch (ex) {
-            if (done) return;
-            done = true;
-            onRejected(ex);
-          }
-        }
-
-        Promise.prototype['catch'] = function (onRejected) {
-          return this.then(null, onRejected);
-        };
-
-        Promise.prototype.then = function (onFulfilled, onRejected) {
-          var me = this;
-          return new Promise(function (resolve, reject) {
-            handle.call(me, new Handler(onFulfilled, onRejected, resolve, reject));
-          });
-        };
-
-        Promise.all = function () {
-          var args = Array.prototype.slice.call(arguments.length === 1 && isArray(arguments[0]) ? arguments[0] : arguments);
-
-          return new Promise(function (resolve, reject) {
-            if (args.length === 0) return resolve([]);
-            var remaining = args.length;
-            function res(i, val) {
-              try {
-                if (val && (typeof val === 'object' || typeof val === 'function')) {
-                  var then = val.then;
-                  if (typeof then === 'function') {
-                    then.call(val, function (val) {
-                      res(i, val);
-                    }, reject);
-                    return;
-                  }
-                }
-                args[i] = val;
-                if (--remaining === 0) {
-                  resolve(args);
-                }
-              } catch (ex) {
-                reject(ex);
-              }
-            }
-            for (var i = 0; i < args.length; i++) {
-              res(i, args[i]);
-            }
-          });
-        };
-
-        Promise.resolve = function (value) {
-          if (value && typeof value === 'object' && value.constructor === Promise) {
-            return value;
-          }
-
-          return new Promise(function (resolve) {
-            resolve(value);
-          });
-        };
-
-        Promise.reject = function (value) {
-          return new Promise(function (resolve, reject) {
-            reject(value);
-          });
-        };
-
-        Promise.race = function (values) {
-          return new Promise(function (resolve, reject) {
-            for (var i = 0, len = values.length; i < len; i++) {
-              values[i].then(resolve, reject);
-            }
-          });
-        };
-
-        /**
-         * Set the immediate function to execute callbacks
-         * @param fn {function} Function to execute
-         * @private
-         */
-        Promise._setImmediateFn = function _setImmediateFn(fn) {
-          asap = fn;
-        };
-
-        if (typeof module !== 'undefined' && module.exports) {
-          module.exports = Promise;
-        } else if (!root.Promise) {
-          root.Promise = Promise;
-        }
-      })(window));
-    }
-  };
-});
-$__System.register('5', [], function (_export) {
-  'use strict';
-
-  return {
-    setters: [],
-    execute: function () {
-      _export('default', (function () {
-
-        try {
-          new CustomEvent('?');
-        } catch (o_O) {
-          /*!(C) Andrea Giammarchi -- WTFPL License*/
-          this.CustomEvent = (function (eventName, defaultInitDict) {
-
-            // the infamous substitute
-            function CustomEvent(type, eventInitDict) {
-              var event = document.createEvent(eventName);
-              if (type !== null) {
-                initCustomEvent.call(event, type, (eventInitDict || (
-                // if falsy we can just use defaults
-                eventInitDict = defaultInitDict)).bubbles, eventInitDict.cancelable, eventInitDict.detail);
-              } else {
-                // no need to put the expando property otherwise
-                // since an event cannot be initialized twice
-                // previous case is the most common one anyway
-                // but if we end up here ... there it goes
-                event.initCustomEvent = initCustomEvent;
-              }
-              return event;
-            }
-
-            // borrowed or attached at runtime
-            function initCustomEvent(type, bubbles, cancelable, detail) {
-              this['init' + eventName](type, bubbles, cancelable, detail);
-              if (!('detail' in this)) {
-                this.detail = detail;
-              }
-            }
-
-            // that's it
-            return CustomEvent;
-          })(
-          // is this IE9 or IE10 ?
-          // where CustomEvent is there
-          // but not usable as construtor ?
-          this.CustomEvent ?
-          // use the CustomEvent interface in such case
-          'CustomEvent' : 'Event',
-          // otherwise the common compatible one
-          {
-            bubbles: false,
-            cancelable: false,
-            detail: null
-          });
-        }
-      }).bind(window)());
-    }
-  };
-});
-$__System.register("8", ["10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "e", "f", "c"], function (_export) {
-  var pageready, clazz, style, dimension, traversing, attributes, events, manipulation, animation, _Object$create, template, cssHelpers, Logger, Collection;
-
-  return {
-    setters: [function (_2) {
-      pageready = _2["default"];
-    }, function (_3) {
-      clazz = _3["default"];
-    }, function (_4) {
-      style = _4["default"];
-    }, function (_5) {
-      dimension = _5["default"];
-    }, function (_6) {
-      traversing = _6["default"];
-    }, function (_7) {
-      attributes = _7["default"];
-    }, function (_8) {
-      events = _8["default"];
-    }, function (_9) {
-      manipulation = _9["default"];
-    }, function (_10) {
-      animation = _10["default"];
-    }, function (_) {
-      _Object$create = _["default"];
-    }, function (_e) {
-      template = _e["default"];
-    }, function (_f) {
-      cssHelpers = _f["default"];
-    }, function (_c) {
-      Logger = _c["default"];
-    }],
-    execute: function () {
-      "use strict";
-
-      Collection = function Collection() {
-        var collection = _Object$create(Array.prototype);
-        collection = Array.apply(collection, arguments) || collection;
-        for (var method in Collection.prototype) {
-          if (Collection.prototype.hasOwnProperty(method)) {
-            collection[method] = Collection.prototype[method];
-          }
-        }
-        return collection;
-      };
-
-      /**
-      * Return a new Collection from the given array.
-      * @param array {Array} The array to be converted into a collection.
-      * @return {Collection} The created collection
-      */
-      Collection.fromArray = function (array) {
-        var collection = Collection.apply(null, array);
-        return collection;
-      };
-
-      /**
-      * Returns a collection of all elements descended from the given context on which it is invoked
-      * that match the specified group of CSS selectors.
-      * @param selector {String|HTMLElement|Collection|window|document} Group of selectors to match on.
-      */
-      Collection.query = function (selector, context) {
-        context = context || document;
-        if (typeof selector === "string") {
-          if (context.querySelectorAll) {
-            return Collection.fromArray(Array.prototype.slice.call(context.querySelectorAll(selector)));
-          }
-        } else if (cssHelpers.isSuportedElement(selector)) {
-          return Collection.fromArray([selector]);
-        }
-        return Collection.fromArray(Array.prototype.slice.call(selector));
-      };
-
-      /**
-      *
-      */
-      Collection.create = function (htmlString) {
-        var container = document.createElement("div");
-        container.innerHTML = htmlString;
-        var children = Array.prototype.slice.call(container.childNodes, 0);
-        children = children.filter(function (child) {
-          return cssHelpers.isSuportedElement(child);
-        });
-        return Collection.fromArray(children);
-      };
-
-      /**
-      * Adds a new method to the collection prototype.
-      *
-      * @param module {Map} Map containing the functions to be added.
-      *   The keys of the map are the names under wich the functions will be presents on the collection
-      *   and the values are the functions to be added.
-      * @param override {Boolean} Wether or not an an existing function should be overriden.
-      *
-      */
-      Collection.addModule = function (module, override) {
-        for (var name in module) {
-          if ((Collection.prototype[name] !== undefined || Array.prototype[name] !== undefined) && override !== true) {
-            Logger.warn("Method '" + name + "' already available.");
-          } else {
-            Collection.prototype[name] = module[name];
-          }
-        }
-      };
-
-      /**
-      * Adds a static method the collection
-      *
-      * @param module {Map} Map containing the functions to be added.
-      *   The keys of the map are the names under wich the functions will be presents on the collection
-      *   and the values are the functions to be added.
-      * @param override {Boolean} Wether or not an an existing function should be overriden.
-      *
-      */
-      Collection.addStaticModule = function (module, override) {
-        for (var name in module) {
-          if (this[name] !== undefined && override !== true) {
-            Logger.warn("Method '" + name + "' already available as static method.");
-          } else {
-            this[name] = module[name];
-          }
-        }
-      };
-
-      Collection.addModule(clazz);
-      Collection.addModule(style);
-      Collection.addModule(traversing);
-      Collection.addModule(attributes);
-      Collection.addModule({
-        find: traversing.find
-      }, true);
-      Collection.addModule(dimension);
-      Collection.addModule(events);
-      Collection.addModule(manipulation);
-      Collection.addModule(animation);
-      Collection.addModule({
-        template: template.template
-      });
-
-      Collection.addStaticModule({
-        template: {
-          addSpecial: template.addSpecial,
-          addSpecials: template.addSpecials,
-          removeSpecial: template.removeSpecial
-        }
-      });
-      Collection.addStaticModule(pageready);
-
-      _export("default", Collection);
-    }
-  };
-});
-$__System.register('a', ['c'], function (_export) {
-  'use strict';
-
-  var Logger, scopeRouter, init;
-  return {
-    setters: [function (_c) {
-      Logger = _c['default'];
-    }],
-    execute: function () {
-      scopeRouter = {};
-
-      // https://github.com/flatiron/director
-      // Generated on Tue Dec 16 2014 12:13:47 GMT+0100 (CET) by Charlie Robbins, Paolo Fragomeni & the Contributors (Using Codesurgeon).
-      // Version 1.2.6
-      //
-
-      (function (exports) {
-
-        /*
-         * browser.js: Browser specific functionality for director.
-         *
-         * (C) 2011, Charlie Robbins, Paolo Fragomeni, & the Contributors.
-         * MIT LICENSE
-         *
-         */
-
-        var dloc = document.location;
-
-        function dlocHashEmpty() {
-          // Non-IE browsers return '' when the address bar shows '#'; Director's logic
-          // assumes both mean empty.
-          return dloc.hash === '' || dloc.hash === '#';
-        }
-
-        var listener = {
-          mode: 'modern',
-          hash: dloc.hash,
-          history: false,
-
-          check: function check() {
-            var h = dloc.hash;
-            if (h != this.hash) {
-              this.hash = h;
-              this.onHashChanged();
-            }
-          },
-
-          fire: function fire() {
-            if (this.mode === 'modern') {
-              this.history === true ? window.onpopstate() : window.onhashchange();
-            } else {
-              this.onHashChanged();
-            }
-          },
-
-          init: function init(fn, history) {
-            var self = this;
-            this.history = history;
-
-            if (!Router.listeners) {
-              Router.listeners = [];
-            }
-
-            function onchange(onChangeEvent) {
-              for (var i = 0, l = Router.listeners.length; i < l; i++) {
-                Router.listeners[i](onChangeEvent);
-              }
-            }
-
-            //note IE8 is being counted as 'modern' because it has the hashchange event
-            if ('onhashchange' in window && (document.documentMode === undefined || document.documentMode > 7)) {
-              // At least for now HTML5 history is available for 'modern' browsers only
-              if (this.history === true) {
-                // There is an old bug in Chrome that causes onpopstate to fire even
-                // upon initial page load. Since the handler is run manually in init(),
-                // this would cause Chrome to run it twise. Currently the only
-                // workaround seems to be to set the handler after the initial page load
-                // http://code.google.com/p/chromium/issues/detail?id=63040
-                setTimeout(function () {
-                  window.onpopstate = onchange;
-                }, 500);
-              } else {
-                window.onhashchange = onchange;
-              }
-              this.mode = 'modern';
-            } else {
-              //
-              // IE support, based on a concept by Erik Arvidson ...
-              //
-              var frame = document.createElement('iframe');
-              frame.id = 'state-frame';
-              frame.style.display = 'none';
-              document.body.appendChild(frame);
-              this.writeFrame('');
-
-              if ('onpropertychange' in document && 'attachEvent' in document) {
-                document.attachEvent('onpropertychange', function () {
-                  if (event.propertyName === 'location') {
-                    self.check();
-                  }
-                });
-              }
-
-              window.setInterval(function () {
-                self.check();
-              }, 50);
-
-              this.onHashChanged = onchange;
-              this.mode = 'legacy';
-            }
-
-            Router.listeners.push(fn);
-
-            return this.mode;
-          },
-
-          destroy: function destroy(fn) {
-            if (!Router || !Router.listeners) {
-              return;
-            }
-
-            var listeners = Router.listeners;
-
-            for (var i = listeners.length - 1; i >= 0; i--) {
-              if (listeners[i] === fn) {
-                listeners.splice(i, 1);
-              }
-            }
-          },
-
-          setHash: function setHash(s) {
-            // Mozilla always adds an entry to the history
-            if (this.mode === 'legacy') {
-              this.writeFrame(s);
-            }
-
-            if (this.history === true) {
-              window.history.pushState({}, document.title, s);
-              // Fire an onpopstate event manually since pushing does not obviously
-              // trigger the pop event.
-              this.fire();
-            } else {
-              dloc.hash = s[0] === '/' ? s : '/' + s;
-            }
-            return this;
-          },
-
-          writeFrame: function writeFrame(s) {
-            // IE support...
-            var f = document.getElementById('state-frame');
-            var d = f.contentDocument || f.contentWindow.document;
-            d.open();
-            d.write('<script>_hash = \'' + s + '\'; onload = parent.listener.syncHash;<script>');
-            d.close();
-          },
-
-          syncHash: function syncHash() {
-            // IE support...
-            var s = this._hash;
-            if (s != dloc.hash) {
-              dloc.hash = s;
-            }
-            return this;
-          },
-
-          onHashChanged: function onHashChanged() {}
-        };
-
-        var Router = exports.Router = function (routes) {
-          if (!(this instanceof Router)) return new Router(routes);
-
-          this.params = {};
-          this.routes = {};
-          this.methods = ['on', 'once', 'after', 'before'];
-          this.scope = [];
-          this._methods = {};
-
-          this._insert = this.insert;
-          this.insert = this.insertEx;
-
-          this.historySupport = (window.history != null ? window.history.pushState : null) != null;
-
-          this.configure();
-          this.mount(routes || {});
-        };
-
-        Router.prototype.init = function (r) {
-          var self = this,
-              routeTo;
-          this.handler = function (onChangeEvent) {
-            var newURL = onChangeEvent && onChangeEvent.newURL || window.location.hash;
-            var url = self.history === true ? self.getPath() : newURL.replace(/.*#/, '');
-            self.dispatch('on', url.charAt(0) === '/' ? url : '/' + url);
-          };
-
-          listener.init(this.handler, this.history);
-
-          if (this.history === false) {
-            if (dlocHashEmpty() && r) {
-              dloc.hash = r;
-            } else if (!dlocHashEmpty()) {
-              self.dispatch('on', '/' + dloc.hash.replace(/^(#\/|#|\/)/, ''));
-            }
-          } else {
-            if (this.convert_hash_in_init) {
-              // Use hash as route
-              routeTo = dlocHashEmpty() && r ? r : !dlocHashEmpty() ? dloc.hash.replace(/^#/, '') : null;
-              if (routeTo) {
-                window.history.replaceState({}, document.title, routeTo);
-              }
-            } else {
-              // Use canonical url
-              routeTo = this.getPath();
-            }
-
-            // Router has been initialized, but due to the chrome bug it will not
-            // yet actually route HTML5 history state changes. Thus, decide if should route.
-            if (routeTo || this.run_in_init === true) {
-              this.handler();
-            }
-          }
-
-          return this;
-        };
-
-        Router.prototype.explode = function () {
-          var v = this.history === true ? this.getPath() : dloc.hash;
-          if (v.charAt(1) === '/') {
-            v = v.slice(1);
-          }
-          return v.slice(1, v.length).split('/');
-        };
-
-        Router.prototype.setRoute = function (i, v, val) {
-          var url = this.explode();
-
-          if (typeof i === 'number' && typeof v === 'string') {
-            url[i] = v;
-          } else if (typeof val === 'string') {
-            url.splice(i, v, s);
-          } else {
-            url = [i];
-          }
-
-          listener.setHash(url.join('/'));
-          return url;
-        };
-
-        //
-        // ### function insertEx(method, path, route, parent)
-        // #### @method {string} Method to insert the specific `route`.
-        // #### @path {Array} Parsed path to insert the `route` at.
-        // #### @route {Array|function} Route handlers to insert.
-        // #### @parent {Object} **Optional** Parent "routes" to insert into.
-        // insert a callback that will only occur once per the matched route.
-        //
-        Router.prototype.insertEx = function (method, path, route, parent) {
-          if (method === 'once') {
-            method = 'on';
-            route = (function (route) {
-              var once = false;
-              return function () {
-                if (once) return;
-                once = true;
-                return route.apply(this, arguments);
-              };
-            })(route);
-          }
-          return this._insert(method, path, route, parent);
-        };
-
-        Router.prototype.getRoute = function (v) {
-          var ret = v;
-
-          if (typeof v === 'number') {
-            ret = this.explode()[v];
-          } else if (typeof v === 'string') {
-            var h = this.explode();
-            ret = h.indexOf(v);
-          } else {
-            ret = this.explode();
-          }
-
-          return ret;
-        };
-
-        Router.prototype.destroy = function () {
-          listener.destroy(this.handler);
-          return this;
-        };
-
-        Router.prototype.getPath = function () {
-          var path = window.location.pathname;
-          if (path.substr(0, 1) !== '/') {
-            path = '/' + path;
-          }
-          return path;
-        };
-
-        function _every(arr, iterator) {
-          for (var i = 0; i < arr.length; i += 1) {
-            if (iterator(arr[i], i, arr) === false) {
-              return;
-            }
-          }
-        }
-
-        function _flatten(arr) {
-          var flat = [];
-          for (var i = 0, n = arr.length; i < n; i++) {
-            flat = flat.concat(arr[i]);
-          }
-          return flat;
-        }
-
-        function _asyncEverySeries(arr, iterator, callback) {
-          if (!arr.length) {
-            return callback();
-          }
-          var completed = 0;
-          (function iterate() {
-            iterator(arr[completed], function (err) {
-              if (err || err === false) {
-                callback(err);
-                callback = function () {};
-              } else {
-                completed += 1;
-                if (completed === arr.length) {
-                  callback();
-                } else {
-                  iterate();
-                }
-              }
-            });
-          })();
-        }
-
-        function paramifyString(str, params, mod) {
-          mod = str;
-          for (var param in params) {
-            if (params.hasOwnProperty(param)) {
-              mod = params[param](str);
-              if (mod !== str) {
-                break;
-              }
-            }
-          }
-          return mod === str ? '([._a-zA-Z0-9-%()]+)' : mod;
-        }
-
-        function regifyString(str, params) {
-          var matches,
-              last = 0,
-              out = '';
-          while (matches = str.substr(last).match(/[^\w\d\- %@&]*\*[^\w\d\- %@&]*/)) {
-            last = matches.index + matches[0].length;
-            matches[0] = matches[0].replace(/^\*/, '([_.()!\\ %@&a-zA-Z0-9-]+)');
-            out += str.substr(0, matches.index) + matches[0];
-          }
-          str = out += str.substr(last);
-          var captures = str.match(/:([^\/]+)/ig),
-              capture,
-              length;
-          if (captures) {
-            length = captures.length;
-            for (var i = 0; i < length; i++) {
-              capture = captures[i];
-              if (capture.slice(0, 2) === '::') {
-                str = capture.slice(1);
-              } else {
-                str = str.replace(capture, paramifyString(capture, params));
-              }
-            }
-          }
-          return str;
-        }
-
-        function terminator(routes, delimiter, start, stop) {
-          var last = 0,
-              left = 0,
-              right = 0,
-              start = (start || '(').toString(),
-              stop = (stop || ')').toString(),
-              i;
-          for (i = 0; i < routes.length; i++) {
-            var chunk = routes[i];
-            if (chunk.indexOf(start, last) > chunk.indexOf(stop, last) || ~chunk.indexOf(start, last) && ! ~chunk.indexOf(stop, last) || ! ~chunk.indexOf(start, last) && ~chunk.indexOf(stop, last)) {
-              left = chunk.indexOf(start, last);
-              right = chunk.indexOf(stop, last);
-              if (~left && ! ~right || ! ~left && ~right) {
-                var tmp = routes.slice(0, (i || 1) + 1).join(delimiter);
-                routes = [tmp].concat(routes.slice((i || 1) + 1));
-              }
-              last = (right > left ? right : left) + 1;
-              i = 0;
-            } else {
-              last = 0;
-            }
-          }
-          return routes;
-        }
-
-        var QUERY_SEPARATOR = /\?.*/;
-
-        Router.prototype.configure = function (options) {
-          options = options || {};
-          for (var i = 0; i < this.methods.length; i++) {
-            this._methods[this.methods[i]] = true;
-          }
-          this.recurse = options.recurse || this.recurse || false;
-          this.async = options.async || false;
-          this.delimiter = options.delimiter || '/';
-          this.strict = typeof options.strict === 'undefined' ? true : options.strict;
-          this.notfound = options.notfound;
-          this.resource = options.resource;
-          this.history = options.html5history && this.historySupport || false;
-          this.run_in_init = this.history === true && options.run_handler_in_init !== false;
-          this.convert_hash_in_init = this.history === true && options.convert_hash_in_init !== false;
-          this.every = {
-            after: options.after || null,
-            before: options.before || null,
-            on: options.on || null
-          };
-          return this;
-        };
-
-        Router.prototype.param = function (token, matcher) {
-          if (token[0] !== ':') {
-            token = ':' + token;
-          }
-          var compiled = new RegExp(token, 'g');
-          this.params[token] = function (str) {
-            return str.replace(compiled, matcher.source || matcher);
-          };
-          return this;
-        };
-
-        Router.prototype.on = Router.prototype.route = function (method, path, route) {
-          var self = this;
-          if (!route && typeof path == 'function') {
-            route = path;
-            path = method;
-            method = 'on';
-          }
-          if (Array.isArray(path)) {
-            return path.forEach(function (p) {
-              self.on(method, p, route);
-            });
-          }
-          if (path.source) {
-            path = path.source.replace(/\\\//ig, '/');
-          }
-          if (Array.isArray(method)) {
-            return method.forEach(function (m) {
-              self.on(m.toLowerCase(), path, route);
-            });
-          }
-          path = path.split(new RegExp(this.delimiter));
-          path = terminator(path, this.delimiter);
-          this.insert(method, this.scope.concat(path), route);
-        };
-
-        Router.prototype.path = function (path, routesFn) {
-          var self = this,
-              length = this.scope.length;
-          if (path.source) {
-            path = path.source.replace(/\\\//ig, '/');
-          }
-          path = path.split(new RegExp(this.delimiter));
-          path = terminator(path, this.delimiter);
-          this.scope = this.scope.concat(path);
-          routesFn.call(this, this);
-          this.scope.splice(length, path.length);
-        };
-
-        Router.prototype.dispatch = function (method, path, callback) {
-          var self = this,
-              fns = this.traverse(method, path.replace(QUERY_SEPARATOR, ''), this.routes, ''),
-              invoked = this._invoked,
-              after;
-          this._invoked = true;
-          if (!fns || fns.length === 0) {
-            this.last = [];
-            if (typeof this.notfound === 'function') {
-              this.invoke([this.notfound], {
-                method: method,
-                path: path
-              }, callback);
-            }
-            return false;
-          }
-          if (this.recurse === 'forward') {
-            fns = fns.reverse();
-          }
-
-          function updateAndInvoke() {
-            self.last = fns.after;
-            self.invoke(self.runlist(fns), self, callback);
-          }
-          after = this.every && this.every.after ? [this.every.after].concat(this.last) : [this.last];
-          if (after && after.length > 0 && invoked) {
-            if (this.async) {
-              this.invoke(after, this, updateAndInvoke);
-            } else {
-              this.invoke(after, this);
-              updateAndInvoke();
-            }
-            return true;
-          }
-          updateAndInvoke();
-          return true;
-        };
-
-        Router.prototype.invoke = function (fns, thisArg, callback) {
-          var self = this;
-          var apply;
-          if (this.async) {
-            apply = function (fn, next) {
-              if (Array.isArray(fn)) {
-                return _asyncEverySeries(fn, apply, next);
-              } else if (typeof fn == 'function') {
-                fn.apply(thisArg, (fns.captures || []).concat(next));
-              }
-            };
-            _asyncEverySeries(fns, apply, function () {
-              if (callback) {
-                callback.apply(thisArg, arguments);
-              }
-            });
-          } else {
-            apply = function (fn) {
-              if (Array.isArray(fn)) {
-                return _every(fn, apply);
-              } else if (typeof fn === 'function') {
-                return fn.apply(thisArg, fns.captures || []);
-              } else if (typeof fn === 'string' && self.resource) {
-                self.resource[fn].apply(thisArg, fns.captures || []);
-              }
-            };
-            _every(fns, apply);
-          }
-        };
-
-        Router.prototype.traverse = function (method, path, routes, regexp, filter) {
-          var fns = [],
-              current,
-              exact,
-              match,
-              next,
-              that;
-
-          function filterRoutes(routes) {
-            if (!filter) {
-              return routes;
-            }
-
-            function deepCopy(source) {
-              var result = [];
-              for (var i = 0; i < source.length; i++) {
-                result[i] = Array.isArray(source[i]) ? deepCopy(source[i]) : source[i];
-              }
-              return result;
-            }
-
-            function applyFilter(fns) {
-              for (var i = fns.length - 1; i >= 0; i--) {
-                if (Array.isArray(fns[i])) {
-                  applyFilter(fns[i]);
-                  if (fns[i].length === 0) {
-                    fns.splice(i, 1);
-                  }
-                } else {
-                  if (!filter(fns[i])) {
-                    fns.splice(i, 1);
-                  }
-                }
-              }
-            }
-            var newRoutes = deepCopy(routes);
-            newRoutes.matched = routes.matched;
-            newRoutes.captures = routes.captures;
-            newRoutes.after = routes.after.filter(filter);
-            applyFilter(newRoutes);
-            return newRoutes;
-          }
-          if (path === this.delimiter && routes[method]) {
-            next = [[routes.before, routes[method]].filter(Boolean)];
-            next.after = [routes.after].filter(Boolean);
-            next.matched = true;
-            next.captures = [];
-            return filterRoutes(next);
-          }
-          for (var r in routes) {
-            if (routes.hasOwnProperty(r) && (!this._methods[r] || this._methods[r] && typeof routes[r] === 'object' && !Array.isArray(routes[r]))) {
-              current = exact = regexp + this.delimiter + r;
-              if (!this.strict) {
-                exact += '[' + this.delimiter + ']?';
-              }
-              match = path.match(new RegExp('^' + exact));
-              if (!match) {
-                continue;
-              }
-              if (match[0] && match[0] == path && routes[r][method]) {
-                next = [[routes[r].before, routes[r][method]].filter(Boolean)];
-                next.after = [routes[r].after].filter(Boolean);
-                next.matched = true;
-                next.captures = match.slice(1);
-                if (this.recurse && routes === this.routes) {
-                  next.push([routes.before, routes.on].filter(Boolean));
-                  next.after = next.after.concat([routes.after].filter(Boolean));
-                }
-                return filterRoutes(next);
-              }
-              next = this.traverse(method, path, routes[r], current);
-              if (next.matched) {
-                if (next.length > 0) {
-                  fns = fns.concat(next);
-                }
-                if (this.recurse) {
-                  fns.push([routes[r].before, routes[r].on].filter(Boolean));
-                  next.after = next.after.concat([routes[r].after].filter(Boolean));
-                  if (routes === this.routes) {
-                    fns.push([routes['before'], routes['on']].filter(Boolean));
-                    next.after = next.after.concat([routes['after']].filter(Boolean));
-                  }
-                }
-                fns.matched = true;
-                fns.captures = next.captures;
-                fns.after = next.after;
-                return filterRoutes(fns);
-              }
-            }
-          }
-          return false;
-        };
-
-        Router.prototype.insert = function (method, path, route, parent) {
-          var methodType, parentType, isArray, nested, part;
-          path = path.filter(function (p) {
-            return p && p.length > 0;
-          });
-          parent = parent || this.routes;
-          part = path.shift();
-          if (/\:|\*/.test(part) && !/\\d|\\w/.test(part)) {
-            part = regifyString(part, this.params);
-          }
-          if (path.length > 0) {
-            parent[part] = parent[part] || {};
-            return this.insert(method, path, route, parent[part]);
-          }
-          if (!part && !path.length && parent === this.routes) {
-            methodType = typeof parent[method];
-            switch (methodType) {
-              case 'function':
-                parent[method] = [parent[method], route];
-                return;
-              case 'object':
-                parent[method].push(route);
-                return;
-              case 'undefined':
-                parent[method] = route;
-                return;
-            }
-            return;
-          }
-          parentType = typeof parent[part];
-          isArray = Array.isArray(parent[part]);
-          if (parent[part] && !isArray && parentType == 'object') {
-            methodType = typeof parent[part][method];
-            switch (methodType) {
-              case 'function':
-                parent[part][method] = [parent[part][method], route];
-                return;
-              case 'object':
-                parent[part][method].push(route);
-                return;
-              case 'undefined':
-                parent[part][method] = route;
-                return;
-            }
-          } else if (parentType == 'undefined') {
-            nested = {};
-            nested[method] = route;
-            parent[part] = nested;
-            return;
-          }
-          throw new Error('Invalid route context: ' + parentType);
-        };
-
-        Router.prototype.extend = function (methods) {
-          var self = this,
-              len = methods.length,
-              i;
-
-          function extend(method) {
-            self._methods[method] = true;
-            self[method] = function () {
-              var extra = arguments.length === 1 ? [method, ''] : [method];
-              self.on.apply(self, extra.concat(Array.prototype.slice.call(arguments)));
-            };
-          }
-          for (i = 0; i < len; i++) {
-            extend(methods[i]);
-          }
-        };
-
-        Router.prototype.runlist = function (fns) {
-          var runlist = this.every && this.every.before ? [this.every.before].concat(_flatten(fns)) : _flatten(fns);
-          if (this.every && this.every.on) {
-            runlist.push(this.every.on);
-          }
-          runlist.captures = fns.captures;
-          runlist.source = fns.source;
-          return runlist;
-        };
-
-        Router.prototype.mount = function (routes, path) {
-          if (!routes || typeof routes !== 'object' || Array.isArray(routes)) {
-            return;
-          }
-          var self = this;
-          path = path || [];
-          if (!Array.isArray(path)) {
-            path = path.split(self.delimiter);
-          }
-
-          function insertOrMount(route, local) {
-            var rename = route,
-                parts = route.split(self.delimiter),
-                routeType = typeof routes[route],
-                isRoute = parts[0] === '' || !self._methods[parts[0]],
-                event = isRoute ? 'on' : rename;
-            if (isRoute) {
-              rename = rename.slice((rename.match(new RegExp('^' + self.delimiter)) || [''])[0].length);
-              parts.shift();
-            }
-            if (isRoute && routeType === 'object' && !Array.isArray(routes[route])) {
-              local = local.concat(parts);
-              self.mount(routes[route], local);
-              return;
-            }
-            if (isRoute) {
-              local = local.concat(rename.split(self.delimiter));
-              local = terminator(local, self.delimiter);
-            }
-            self.insert(event, local, routes[route]);
-          }
-          for (var route in routes) {
-            if (routes.hasOwnProperty(route)) {
-              insertOrMount(route, path.slice(0));
-            }
-          }
-        };
-      })(typeof exports === 'object' ? exports : scopeRouter);
-
-      init = scopeRouter.Router.prototype.init;
-
-      scopeRouter.Router.prototype.init = function (redirect) {
-
-        redirect = redirect || '/';
-
-        init.apply(this, arguments);
-
-        var initialRoute = window.location.hash.slice(2);
-        if (initialRoute) {
-          window.setTimeout(function () {
-            if (typeof HashChangeEvent != 'undefined') {
-              window.dispatchEvent(new HashChangeEvent('hashchange'));
-            } else {
-              var evt = document.createEvent('Event');
-              evt.initEvent('hashchange', true, false);
-              window.dispatchEvent(evt);
-            }
-          }, 0);
-        }
-
-        window.addEventListener('hashchange', (function (e) {
-          var currRoute = this.getRoute();
-          if (currRoute[0].length && !this.routes[currRoute[0]]) {
-            Logger.warn('The route \'#/' + currRoute + '\' does not exists ! Redirected to \'#' + redirect + '\'');
-            this.setRoute(redirect);
-          }
-        }).bind(this), false);
-
-        return this;
-      };
-
-      _export('default', scopeRouter);
-    }
-  };
-});
-$__System.register("9", ["1b", "1c", "1a"], function (_export) {
-  var _createClass, _classCallCheck, Notifier, Observable;
-
-  return {
-    setters: [function (_b) {
-      _createClass = _b["default"];
-    }, function (_c) {
-      _classCallCheck = _c["default"];
-    }, function (_a) {
-      Notifier = _a["default"];
-    }],
-    execute: function () {
-      "use strict";
-
-      Observable = (function () {
-        function Observable() {
-          _classCallCheck(this, Observable);
-
-          this.$$__notifier = new Notifier();
-          Object.observe(this, this.onChange.bind(this));
-        }
-
-        _createClass(Observable, [{
-          key: "onChange",
-          value: function onChange(changes) {
-
-            var eventName = null;
-            changes = this.extractPublicMembers(changes);
-
-            changes.forEach((function (change) {
-              eventName = change.name + "Change";
-              this.fireEvent(eventName, change);
-            }).bind(this));
-
-            if (changes.length > 0) {
-              this.fireEvent("change", changes);
-            }
-          }
-        }, {
-          key: "extractPublicMembers",
-          value: function extractPublicMembers(changes) {
-            var firstCharCode = null;
-            changes = changes.filter(function (change) {
-              firstCharCode = change.name.toLowerCase().charCodeAt(0);
-              return firstCharCode >= 97 && firstCharCode <= 122;
-            });
-            return changes;
-          }
-        }, {
-          key: "addListener",
-          value: function addListener(eventType, listener, context) {
-            this.$$__notifier.subscribe(eventType, listener, context);
-          }
-        }, {
-          key: "fireEvent",
-          value: function fireEvent(eventType, eventData) {
-            window.setTimeout(this.$$__notifier.notify.bind(this.$$__notifier, eventType, eventData), 0);
-          }
-        }, {
-          key: "on",
-          value: function on(eventType, listener, context) {
-            this.addListener(eventType, listener, context);
-          }
-        }, {
-          key: "off",
-          value: function off(eventType, listener, context) {
-            this.$$__notifier.unsubscribe(eventType, listener, context);
-          }
-        }, {
-          key: "once",
-          value: function once(eventType, listener, context) {
-            var that = this;
-            var callback = (function () {
-              listener.apply(context, [].slice.call(arguments));
-              this.off(eventType, callback);
-            }).bind(this);
-            this.addListener(eventType, callback, context);
-          }
-        }]);
-
-        return Observable;
-      })();
-
-      _export("default", Observable);
-    }
-  };
-});
-$__System.register("b", ["1e", "1f", "1d"], function (_export) {
-	var _Object$assign, _Promise, XHR;
-
-	return {
-		setters: [function (_e) {
-			_Object$assign = _e["default"];
-		}, function (_f) {
-			_Promise = _f["default"];
-		}, function (_d) {
-			XHR = _d["default"];
-		}],
-		execute: function () {
-			"use strict";
-
-			_export("default", (function () {
-
-				/**
-    * *async*
-    * *user*
-    * *password*
-    * *headers*
-    * *timeout*
-    *
-    */
-
-				var defaultOptions = {
-					async: true,
-					timeout: 3000,
-					user: null,
-					password: "",
-					cache: false
-				};
-
-				var processRequest = function processRequest(xhr, options) {
-
-					options = options || {};
-					options.headers = options.headers || {};
-					options = _Object$assign(defaultOptions, options);
-
-					xhr.setAsync(options.async);
-					xhr.setCaching(options.cache);
-					xhr.setTimeout(options.timeout);
-
-					if (options.user !== null) {
-						xhr.setCredencials(options.user, options.password);
-					}
-
-					xhr.send();
-
-					return new _Promise(function (resolve, reject) {
-						xhr.on("success", function (e) {
-							resolve(e);
-						});
-						xhr.on("fail", function (e) {
-							reject(e);
-						});
-					});
-				};
-
-				var instance = null;
-
-				var getInstance = function getInstance(method, url, data) {
-					data = data || {};
-					if (instance === null) {
-						instance = new XHR(method, url, data);
-						instance.$$oid = "scope_" + new Date().getTime();
-					} else {
-						instance.setMethod(method);
-						instance.setUrl(url);
-						instance.setRequestData(data);
-					}
-					return instance;
-				};
-
-				return {
-
-					/**
-     * Send an http get request
-     * @param url {String} The request url
-     * @param data {Map} Map containing key/value pairs data to be sent
-     * @param options {Map} Map containing the request options.
-     *   
-     *
-     */
-					get: function get(url, data, options) {
-						return processRequest(getInstance("get", url, data), options);
-					},
-
-					post: function post(url, data, options) {
-						return processRequest(getInstance("post", url, data), options);
-					},
-
-					put: function put(url, data, options) {
-						return processRequest(getInstance("put", url, data), options);
-					},
-
-					"delete": function _delete(url, data, options) {
-						return processRequest(getInstance("delete", url, data), options);
-					}
-
-				};
-			})());
-		}
-	};
-});
-$__System.register('c', [], function (_export) {
+$__System.register('e', [], function (_export) {
     'use strict';
 
     var scopeLogger;
@@ -6034,18 +3246,18 @@ $__System.register('c', [], function (_export) {
             })(scopeLogger, function () {
                 var self = {};
                 var noop = function noop() {};
-                var undefinedType = 'undefined';
+                var undefinedType = "undefined";
 
                 function realMethod(methodName) {
                     if (typeof console === undefinedType) {
                         return false; // We can't build a real method without a console to log to
                     } else if (console[methodName] !== undefined) {
-                        return bindMethod(console, methodName);
-                    } else if (console.log !== undefined) {
-                        return bindMethod(console, 'log');
-                    } else {
-                        return noop;
-                    }
+                            return bindMethod(console, methodName);
+                        } else if (console.log !== undefined) {
+                            return bindMethod(console, 'log');
+                        } else {
+                            return noop;
+                        }
                 }
 
                 function bindMethod(obj, methodName) {
@@ -6073,7 +3285,7 @@ $__System.register('c', [], function (_export) {
                     };
                 }
 
-                var logMethods = ['trace', 'debug', 'info', 'warn', 'error'];
+                var logMethods = ["trace", "debug", "info", "warn", "error"];
 
                 function replaceLoggingMethods(level) {
                     for (var i = 0; i < logMethods.length; i++) {
@@ -6093,7 +3305,7 @@ $__System.register('c', [], function (_export) {
 
                     // Use session cookie as fallback
                     try {
-                        window.document.cookie = 'loglevel=' + levelName + ';';
+                        window.document.cookie = "loglevel=" + levelName + ";";
                     } catch (ignore) {}
                 }
 
@@ -6111,7 +3323,7 @@ $__System.register('c', [], function (_export) {
                     }
 
                     if (self.levels[storedLevel] === undefined) {
-                        storedLevel = 'WARN';
+                        storedLevel = "WARN";
                     }
 
                     self.setLevel(self.levels[storedLevel], false);
@@ -6123,28 +3335,28 @@ $__System.register('c', [], function (_export) {
                  *
                  */
 
-                self.levels = { 'TRACE': 0, 'DEBUG': 1, 'INFO': 2, 'WARN': 3,
-                    'ERROR': 4, 'SILENT': 5 };
+                self.levels = { "TRACE": 0, "DEBUG": 1, "INFO": 2, "WARN": 3,
+                    "ERROR": 4, "SILENT": 5 };
 
                 self.methodFactory = function (methodName, level) {
                     return realMethod(methodName) || enableLoggingWhenConsoleArrives(methodName, level);
                 };
 
                 self.setLevel = function (level, persist) {
-                    if (typeof level === 'string' && self.levels[level.toUpperCase()] !== undefined) {
+                    if (typeof level === "string" && self.levels[level.toUpperCase()] !== undefined) {
                         level = self.levels[level.toUpperCase()];
                     }
-                    if (typeof level === 'number' && level >= 0 && level <= self.levels.SILENT) {
+                    if (typeof level === "number" && level >= 0 && level <= self.levels.SILENT) {
                         if (persist !== false) {
                             // defaults to true
                             persistLevelIfPossible(level);
                         }
                         replaceLoggingMethods(level);
                         if (typeof console === undefinedType && level < self.levels.SILENT) {
-                            return 'No console available for logging';
+                            return "No console available for logging";
                         }
                     } else {
-                        throw 'log.setLevel() called with invalid level: ' + level;
+                        throw "log.setLevel() called with invalid level: " + level;
                     }
                 };
 
@@ -6174,7 +3386,185 @@ $__System.register('c', [], function (_export) {
         }
     };
 });
-$__System.register("e", ["21", "c"], function (_export) {
+$__System.register("f", [], function (_export) {
+  "use strict";
+
+  return {
+    setters: [],
+    execute: function () {
+      _export("default", {
+
+        classToTypeMap: {
+          "[object String]": "String",
+          "[object Array]": "Array",
+          "[object Object]": "Object",
+          "[object RegExp]": "RegExp",
+          "[object Number]": "Number",
+          "[object Boolean]": "Boolean",
+          "[object Date]": "Date",
+          "[object Function]": "Function",
+          "[object Error]": "Error"
+        },
+
+        getType: function getType(value) {
+          return this.getClass(value);
+        },
+
+        getClass: function getClass(value) {
+          // The typeof null and undefined is "object" under IE8
+          if (value === undefined) {
+            return "Undefined";
+          } else if (value === null) {
+            return "Null";
+          }
+          var classString = Object.prototype.toString.call(value);
+          return this.classToTypeMap[classString] || classString.slice(8, -1);
+        },
+
+        getUID: function getUID() {
+          return (new Date().getTime() + "" + Math.floor(Math.random() * 1000000)).substr(0, 18);
+        },
+
+        isFunction: function isFunction(obj) {
+          return typeof obj === 'function';
+        },
+
+        equals: function equals(object1, object2) {
+          return this.__equals(object1, object2, [], []);
+        },
+
+        isObject: function isObject(obj) {
+          return Object.prototype.toString.call(obj) == "[object Object]";
+        },
+
+        isDate: function isDate(obj) {
+          return Object.prototype.toString.call(obj) == "[object Date]";
+        },
+
+        camelCase: function camelCase(s) {
+          if (s.indexOf("-") != -1) {
+            return (s || '').toLowerCase().replace(/(-)\w/g, function (m) {
+              return m.toUpperCase().replace(/-/, '');
+            });
+          }
+          return s;
+        },
+
+        firstUp: function firstUp(str) {
+          return str.charAt(0).toUpperCase() + str.substr(1);
+        },
+
+        hyphenate: function hyphenate(str) {
+          return str.replace(/\s/g, "-").toLowerCase();
+        },
+
+        __equals: function __equals(object1, object2, aStack, bStack) {
+          // Identical objects are equal. `0 === -0`, but they aren't identical.
+          // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
+          if (object1 === object2) {
+            return object1 !== 0 || 1 / object1 == 1 / object2;
+          }
+          // A strict comparison is necessary because `null == undefined`.
+          if (object1 === null || object2 === null) {
+            return object1 === object2;
+          }
+          // Compare `[[Class]]` names.
+          var className = Object.prototype.toString.call(object1);
+          if (className != Object.prototype.toString.call(object2)) {
+            return false;
+          }
+          switch (className) {
+            // Strings, numbers, dates, and booleans are compared by value.
+            case '[object String]':
+              // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
+              // equivalent to `new String("5")`.
+              return object1 == String(object2);
+            case '[object Number]':
+              // `NaN`s are equivalent, but non-reflexive. An `egal` comparison is performed for
+              // other numeric values.
+              return object1 != +object1 ? object2 != +object2 : object1 === 0 ? 1 / object1 == 1 / object2 : object1 == +object2;
+            case '[object Date]':
+            case '[object Boolean]':
+              // Coerce dates and booleans to numeric primitive values. Dates are compared by their
+              // millisecond representations. Note that invalid dates with millisecond representations
+              // of `NaN` are not equivalent.
+              return +object1 == +object2;
+            // RegExps are compared by their source patterns and flags.
+            case '[object RegExp]':
+              return object1.source == object2.source && object1.global == object2.global && object1.multiline == object2.multiline && object1.ignoreCase == object2.ignoreCase;
+          }
+          if (typeof object1 != 'object' || typeof object2 != 'object') {
+            return false;
+          }
+          // Assume equality for cyclic structures. The algorithm for detecting cyclic
+          // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+          var length = aStack.length;
+          while (length--) {
+            // Linear search. Performance is inversely proportional to the number of
+            // unique nested structures.
+            if (aStack[length] == object1) {
+              return bStack[length] == object2;
+            }
+          }
+          // Objects with different constructors are not equivalent, but `Object`s
+          // from different frames are.
+          var aCtor = object1.constructor,
+              bCtor = object2.constructor;
+          if (aCtor !== bCtor && !(this.isFunction(aCtor) && aCtor instanceof aCtor && this.isFunction(bCtor) && bCtor instanceof bCtor) && ('constructor' in object1 && 'constructor' in object2)) {
+            return false;
+          }
+          // Add the first object to the stack of traversed objects.
+          aStack.push(object1);
+          bStack.push(object2);
+          var size = 0,
+              result = true;
+          // Recursively compare objects and arrays.
+          if (className == '[object Array]') {
+            // Compare array lengths to determine if a deep comparison is necessary.
+            size = object1.length;
+            result = size == object2.length;
+            if (result) {
+              // Deep compare the contents, ignoring non-numeric properties.
+              while (size--) {
+                if (!(result = this.__equals(object1[size], object2[size], aStack, bStack))) {
+                  break;
+                }
+              }
+            }
+          } else {
+            // Deep compare objects.
+            for (var key in object1) {
+              if (Object.prototype.hasOwnProperty.call(object1, key)) {
+                // Count the expected number of properties.
+                size++;
+                // Deep compare each member.
+                if (!(result = Object.prototype.hasOwnProperty.call(object2, key) && this.__equals(object1[key], object2[key], aStack, bStack))) {
+                  break;
+                }
+              }
+            }
+            // Ensure that both objects contain the same number of properties.
+            if (result) {
+              for (key in object2) {
+                if (Object.prototype.hasOwnProperty.call(object2, key) && ! size--) {
+                  break;
+                }
+              }
+              result = !size;
+            }
+          }
+          // Remove the first object from the stack of traversed objects.
+          aStack.pop();
+          bStack.pop();
+
+          return result;
+        }
+
+      });
+    }
+  };
+});
+$__System.register("10", ["e", "f"], function (_export) {
   /**
   TODO : Partial rendering for Conditions
   conditions could also be function calls
@@ -6182,12 +3572,12 @@ $__System.register("e", ["21", "c"], function (_export) {
 
   "use strict";
 
-  var utils, Logger;
+  var Logger, utils;
   return {
-    setters: [function (_) {
-      utils = _["default"];
-    }, function (_c) {
-      Logger = _c["default"];
+    setters: [function (_e) {
+      Logger = _e["default"];
+    }, function (_f) {
+      utils = _f["default"];
     }],
     execute: function () {
       _export("default", (function () {
@@ -6955,13 +4345,13 @@ $__System.register("e", ["21", "c"], function (_export) {
     }
   };
 });
-$__System.register("f", ["21"], function (_export) {
+$__System.register("11", ["f"], function (_export) {
   "use strict";
 
   var utils;
   return {
-    setters: [function (_) {
-      utils = _["default"];
+    setters: [function (_f) {
+      utils = _f["default"];
     }],
     execute: function () {
       _export("default", (function () {
@@ -6986,7 +4376,7 @@ $__System.register("f", ["21"], function (_export) {
           },
 
           classRegEx: function classRegEx(name) {
-            return name in classCache ? classCache[name] : classCache[name] = new RegExp("(^|\\s)" + name + "(\\s|$)");
+            return name in classCache ? classCache[name] : classCache[name] = new RegExp('(^|\\s)' + name + '(\\s|$)');
           },
 
           nodeListToArray: function nodeListToArray(nodeList) {
@@ -7076,7 +4466,7 @@ $__System.register("f", ["21"], function (_export) {
     }
   };
 });
-$__System.register("10", [], function (_export) {
+$__System.register("12", [], function (_export) {
   "use strict";
 
   return {
@@ -7112,13 +4502,13 @@ $__System.register("10", [], function (_export) {
     }
   };
 });
-$__System.register("11", ["f"], function (_export) {
+$__System.register("13", ["11"], function (_export) {
   "use strict";
 
   var cssHelpers;
   return {
-    setters: [function (_f) {
-      cssHelpers = _f["default"];
+    setters: [function (_) {
+      cssHelpers = _["default"];
     }],
     execute: function () {
       _export("default", {
@@ -7193,15 +4583,15 @@ $__System.register("11", ["f"], function (_export) {
     }
   };
 });
-$__System.register("12", ["21", "f"], function (_export) {
+$__System.register("14", ["11", "f"], function (_export) {
   "use strict";
 
-  var utils, cssHelpers;
+  var cssHelpers, utils;
   return {
     setters: [function (_) {
-      utils = _["default"];
+      cssHelpers = _["default"];
     }, function (_f) {
-      cssHelpers = _f["default"];
+      utils = _f["default"];
     }],
     execute: function () {
       _export("default", {
@@ -7232,7 +4622,7 @@ $__System.register("12", ["21", "f"], function (_export) {
     }
   };
 });
-$__System.register("13", [], function (_export) {
+$__System.register("15", [], function (_export) {
   "use strict";
 
   return {
@@ -7371,7 +4761,7 @@ $__System.register("13", [], function (_export) {
     }
   };
 });
-$__System.register("14", ["8"], function (_export) {
+$__System.register("3", ["16"], function (_export) {
   "use strict";
 
   var Collection;
@@ -7461,13 +4851,13 @@ $__System.register("14", ["8"], function (_export) {
     }
   };
 });
-$__System.register("15", ["21"], function (_export) {
+$__System.register("17", ["f"], function (_export) {
   "use strict";
 
   var utils;
   return {
-    setters: [function (_) {
-      utils = _["default"];
+    setters: [function (_f) {
+      utils = _f["default"];
     }],
     execute: function () {
       _export("default", (function () {
@@ -7587,19 +4977,624 @@ $__System.register("15", ["21"], function (_export) {
     }
   };
 });
-$__System.register("16", ["21", "22", "23", "1a"], function (_export) {
+$__System.register("18", [], function (_export) {
   "use strict";
 
-  var utils, helpers, emitter, Notifier;
+  return {
+    setters: [],
+    execute: function () {
+      _export("default", {
+
+        isEventSupported: function isEventSupported(target, eventName) {
+          eventName = "on" + eventName;
+          var isSupported = (eventName in target);
+          if (!isSupported) {
+            target.setAttribute(eventName, "return;");
+            isSupported = typeof target[eventName] == "function";
+            target.removeAttribute(eventName);
+          }
+          return isSupported;
+        }
+
+      });
+    }
+  };
+});
+$__System.registerDynamic("19", ["b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $ = req('b');
+  module.exports = function defineProperty(it, key, desc) {
+    return $.setDesc(it, key, desc);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1a", ["19"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('19'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1b", ["1a"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  var _Object$defineProperty = req('1a')["default"];
+  exports["default"] = (function() {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor)
+          descriptor.writable = true;
+        _Object$defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+    return function(Constructor, protoProps, staticProps) {
+      if (protoProps)
+        defineProperties(Constructor.prototype, protoProps);
+      if (staticProps)
+        defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  })();
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1c", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  exports["default"] = function(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  };
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1d", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = module.exports = typeof window != 'undefined' && window.Math == Math ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+  if (typeof __g == 'number')
+    __g = global;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1e", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var core = module.exports = {version: '1.2.3'};
+  if (typeof __e == 'number')
+    __e = core;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("1f", ["1d", "1e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = req('1d'),
+      core = req('1e'),
+      PROTOTYPE = 'prototype';
+  var ctx = function(fn, that) {
+    return function() {
+      return fn.apply(that, arguments);
+    };
+  };
+  var $def = function(type, name, source) {
+    var key,
+        own,
+        out,
+        exp,
+        isGlobal = type & $def.G,
+        isProto = type & $def.P,
+        target = isGlobal ? global : type & $def.S ? global[name] : (global[name] || {})[PROTOTYPE],
+        exports = isGlobal ? core : core[name] || (core[name] = {});
+    if (isGlobal)
+      source = name;
+    for (key in source) {
+      own = !(type & $def.F) && target && key in target;
+      if (own && key in exports)
+        continue;
+      out = own ? target[key] : source[key];
+      if (isGlobal && typeof target[key] != 'function')
+        exp = source[key];
+      else if (type & $def.B && own)
+        exp = ctx(out, global);
+      else if (type & $def.W && target[key] == out)
+        !function(C) {
+          exp = function(param) {
+            return this instanceof C ? new C(param) : C(param);
+          };
+          exp[PROTOTYPE] = C[PROTOTYPE];
+        }(out);
+      else
+        exp = isProto && typeof out == 'function' ? ctx(Function.call, out) : out;
+      exports[key] = exp;
+      if (isProto)
+        (exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+    }
+  };
+  $def.F = 1;
+  $def.G = 2;
+  $def.S = 4;
+  $def.P = 8;
+  $def.B = 16;
+  $def.W = 32;
+  module.exports = $def;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("20", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toString = {}.toString;
+  module.exports = function(it) {
+    return toString.call(it).slice(8, -1);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("21", ["20"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var cof = req('20');
+  module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it) {
+    return cof(it) == 'String' ? it.split('') : Object(it);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("22", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it) {
+    if (it == undefined)
+      throw TypeError("Can't call method on  " + it);
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("23", ["21", "22"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var IObject = req('21'),
+      defined = req('22');
+  module.exports = function(it) {
+    return IObject(defined(it));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("24", ["b", "23"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $ = req('b'),
+      toIObject = req('23'),
+      isEnum = $.isEnum;
+  module.exports = function(isEntries) {
+    return function(it) {
+      var O = toIObject(it),
+          keys = $.getKeys(O),
+          length = keys.length,
+          i = 0,
+          result = [],
+          key;
+      while (length > i)
+        if (isEnum.call(O, key = keys[i++])) {
+          result.push(isEntries ? [key, O[key]] : O[key]);
+        }
+      return result;
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("25", ["1f", "24"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $def = req('1f'),
+      $values = req('24')(false);
+  $def($def.S, 'Object', {values: function values(it) {
+      return $values(it);
+    }});
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("26", ["25", "1e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('25');
+  module.exports = req('1e').Object.values;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("27", ["26"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('26'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register("28", ["11", "18", "27", "e", "f"], function (_export) {
+  var cssHelpers, eventHelpers, _Object$values, Logger, utils;
+
+  return {
+    setters: [function (_3) {
+      cssHelpers = _3["default"];
+    }, function (_2) {
+      eventHelpers = _2["default"];
+    }, function (_) {
+      _Object$values = _["default"];
+    }, function (_e) {
+      Logger = _e["default"];
+    }, function (_f) {
+      utils = _f["default"];
+    }],
+    execute: function () {
+      "use strict";
+
+      _export("default", (function () {
+
+        var keyEventSpec = "keyboard";
+
+        (function () {
+          var evt = document.createEvent('KeyboardEvent');
+          keyEventSpec = evt.initKeyEvent ? "key" : "keyboard";
+        })();
+
+        var createTouch = function createTouch(target) {
+          return {
+            view: window,
+            target: target,
+            identifier: utils.getUID(),
+            pageX: 0,
+            pageY: 0,
+            screenX: 0,
+            screenY: 0
+          };
+        };
+
+        var addDefaultTouches = function addDefaultTouches(target, eventName, properties) {
+          var touch = createTouch(target);
+          if (properties.touches.length === 0) {
+            properties.touches.push(touch);
+          }
+          if (properties.targetTouches.length === 0) {
+            properties.targetTouches.push(touch);
+          }
+          if (properties.changedTouches.length === 0) {
+            properties.changedTouches.push(touch);
+          }
+        };
+
+        var isMouseEvent = function isMouseEvent(eventName) {
+          return eventName == "click" || eventName == "dbclick" || eventName.indexOf("mouse") === 0;
+        };
+
+        var isTouchEvent = function isTouchEvent(eventName) {
+          return eventName.indexOf("touch") === 0;
+        };
+
+        var isPointerEvent = function isPointerEvent(eventName) {
+          return eventName.indexOf("pointer") === 0;
+        };
+
+        var isKeyBoardEvent = function isKeyBoardEvent(eventName) {
+          return eventName.indexOf("key") === 0;
+        };
+
+        var createUIEvent = function createUIEvent(eventName, properties) {
+          var evt = null;
+          properties = properties || {};
+          if (typeof UIEvent != "undefined") {
+            try {
+              evt = new UIEvent(eventName, properties);
+            } catch (err) {
+              Logger.info("UIEvent construnctor not supported on, document.createEvent used instead.");
+            }
+          }
+          if (evt === null) {
+            evt = document.createEvent('UIEvent');
+            evt.initUIEvent.apply(evt, [eventName].concat(_Object$values(properties)));
+          }
+          return evt;
+        };
+
+        var createKeyBoardEvent = function createKeyBoardEvent(eventName, properties) {
+          var evt = null;
+          properties = properties || {};
+          if (typeof KeyboardEvent != "undefined") {
+            try {
+              evt = new KeyboardEvent(eventName, properties);
+            } catch (err) {
+              Logger.info("KeyboardEvent construnctor not supported on, document.createEvent used instead.");
+            }
+          }
+          if (evt === null) {
+            evt = document.createEvent('KeyboardEvent');
+            var init = evt.initKeyEvent || evt.initKeyboardEvent;
+            init.apply(evt, [eventName].concat(_Object$values(properties)));
+          }
+          return evt;
+        };
+
+        var createMouseEvent = function createMouseEvent(eventName, properties) {
+          var evt = null;
+          properties = properties || {};
+          if (typeof MouseEvent != "undefined") {
+            try {
+              evt = new MouseEvent(eventName, properties);
+            } catch (err) {
+              Logger.info("MouseEvent construnctor not supported on, document.createEvent used instead.");
+            }
+          }
+          if (evt === null) {
+            evt = document.createEvent('MouseEvent');
+            evt.initMouseEvent.apply(evt, [eventName].concat(_Object$values(properties)));
+          }
+          return evt;
+        };
+
+        var createTouchEvent = function createTouchEvent(target, eventName, properties) {
+          var evt = null;
+          properties = properties || {};
+          properties = addDefaultTouches(target, eventName, properties);
+
+          if (typeof TouchEvent != "undefined") {
+            try {
+              evt = new TouchEvent(eventName, properties);
+            } catch (err) {
+              Logger.info("TouchEvent construnctor not supported on, document.createEvent used instead.");
+            }
+          }
+
+          if (evt === null) {
+            evt = document.createEvent('TouchEvent');
+            evt.initTouchEvent.apply(evt, [eventName].concat(_Object$values(properties)));
+          }
+
+          return evt;
+        };
+
+        var createPointerEvent = function createPointerEvent(eventName, properties) {
+
+          var evt = null;
+          properties = properties || {};
+
+          if (typeof PointerEvent != "undefined") {
+            try {
+              evt = new PointerEvent(eventName, properties);
+            } catch (err) {
+              Logger.info("PointerEvent construnctor not supported on, document.createEvent used instead.");
+            }
+          }
+
+          if (evt === null) {
+            evt = document.createEvent('PointerEvent');
+            evt.initPointerEvent.apply(evt, [eventName].concat(_Object$values(properties)));
+          }
+
+          return evt;
+        };
+
+        var createEvent = function createEvent(item, eventName, properties) {
+          if (isMouseEvent(eventName)) {
+            return createMouseEvent(eventName, properties);
+          } else if (isTouchEvent(eventName)) {
+            return createTouchEvent(item, eventName, properties);
+          } else if (isPointerEvent(eventName)) {
+            return createPointerEvent(eventName, properties);
+          } else if (isKeyBoardEvent(eventName)) {
+            return createKeyBoardEvent(eventName, properties);
+          } else {
+            return createUIEvent(eventName, properties);
+          }
+        };
+
+        return {
+
+          emitNative: function emitNative(eventName, properties) {
+            properties = properties || {};
+            this.forEach(function (item) {
+              if (eventHelpers.isEventSupported(item, eventName)) {
+                var evt = createEvent(item, eventName, properties);
+                item.dispatchEvent(evt);
+              } else {
+                Logger.error(eventName + " not supported on " + item);
+              }
+            });
+            return this;
+          },
+
+          emitCustom: function emitCustom(eventName, data) {
+            data = data || {};
+            this.forEach(function (item) {
+              item.dispatchEvent(new CustomEvent(eventName, data));
+            });
+            return this;
+          }
+
+        };
+      })());
+    }
+  };
+});
+$__System.register("29", ["28", "1b", "1c"], function (_export) {
+  var emitter, _createClass, _classCallCheck, Notifier;
+
   return {
     setters: [function (_) {
-      utils = _["default"];
-    }, function (_2) {
-      helpers = _2["default"];
+      emitter = _["default"];
+    }, function (_b) {
+      _createClass = _b["default"];
+    }, function (_c) {
+      _classCallCheck = _c["default"];
+    }],
+    execute: function () {
+      "use strict";
+
+      Notifier = (function () {
+        function Notifier() {
+          _classCallCheck(this, Notifier);
+
+          this.$$subscribers = {};
+          this.$$counter = 1;
+        }
+
+        _createClass(Notifier, [{
+          key: "registerEvent",
+          value: function registerEvent(type, callback, ctx, once) {
+            ctx = ctx || this;
+            this.$$subscribers[type] = this.$$subscribers[type] || [];
+            var listener = {
+              fn: callback,
+              fnCtx: function fnCtx() {
+                callback.apply(ctx, [].slice.call(arguments));
+              },
+              scope: ctx,
+              once: once
+            };
+            this.$$subscribers[type].push(listener);
+            return listener;
+          }
+        }, {
+          key: "on",
+          value: function on(type, callback, ctx) {
+            return this.registerEvent(type, callback, ctx, false);
+          }
+        }, {
+          key: "off",
+          value: function off(type, callback, ctx) {
+            ctx = ctx || this;
+            var removed = [];
+            this.$$subscribers[type] = this.$$subscribers[type] || [];
+            this.$$subscribers[type] = this.$$subscribers[type].filter(function (subscriber) {
+              if (!(subscriber.fn == callback && subscriber.scope == ctx)) {
+                removed.push(subscriber);
+                return true;
+              }
+            });
+            if (this.$$subscribers[type].length === 0) {
+              delete this.$$subscribers[type];
+            }
+            return removed;
+          }
+        }, {
+          key: "once",
+          value: function once(type, callback, ctx) {
+            return this.registerEvent(type, callback, ctx, true);
+          }
+        }, {
+          key: "emit",
+          value: function emit(type, message) {
+
+            var removed = [];
+            this.$$subscribers[type] = this.$$subscribers[type] || [];
+            this.$$subscribers[type].forEach(function (subscriber, index) {
+              subscriber.fn.call(subscriber.scope, message);
+              if (subscriber.once === true) {
+                removed.push(subscriber);
+              }
+            });
+
+            var index = null;
+            removed.forEach(function (toRemove) {
+              index = this.$$subscribers[type].indexOf(toRemove);
+              this.$$subscribers[type].splice(index, 1);
+            }, this);
+
+            if (this.$$subscribers[type].length === 0) {
+              delete this.$$subscribers[type];
+            }
+
+            return removed;
+          }
+        }, {
+          key: "emitNative",
+          value: function emitNative(eventName, properties) {
+            emitter.emitNative.call(this, eventName, properties);
+          }
+        }]);
+
+        return Notifier;
+      })();
+
+      _export("default", Notifier);
+    }
+  };
+});
+$__System.register("2a", ["18", "28", "29", "f"], function (_export) {
+  "use strict";
+
+  var helpers, emitter, Notifier, utils;
+  return {
+    setters: [function (_) {
+      helpers = _["default"];
     }, function (_3) {
       emitter = _3["default"];
-    }, function (_a) {
-      Notifier = _a["default"];
+    }, function (_2) {
+      Notifier = _2["default"];
+    }, function (_f) {
+      utils = _f["default"];
     }],
     execute: function () {
       _export("default", (function () {
@@ -7680,7 +5675,7 @@ $__System.register("16", ["21", "22", "23", "1a"], function (_export) {
     }
   };
 });
-$__System.register("17", ["8"], function (_export) {
+$__System.register("2", ["16"], function (_export) {
   "use strict";
 
   var Collection;
@@ -7807,12 +5802,1402 @@ $__System.register("17", ["8"], function (_export) {
     }
   };
 });
-$__System.register("18", ["1f"], function (_export) {
+$__System.registerDynamic("2b", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "format cjs";
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("2c", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var ceil = Math.ceil,
+      floor = Math.floor;
+  module.exports = function(it) {
+    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("2d", ["2c", "22"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toInteger = req('2c'),
+      defined = req('22');
+  module.exports = function(TO_STRING) {
+    return function(that, pos) {
+      var s = String(defined(that)),
+          i = toInteger(pos),
+          l = s.length,
+          a,
+          b;
+      if (i < 0 || i >= l)
+        return TO_STRING ? '' : undefined;
+      a = s.charCodeAt(i);
+      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff ? TO_STRING ? s.charAt(i) : a : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("2e", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("2f", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(bitmap, value) {
+    return {
+      enumerable: !(bitmap & 1),
+      configurable: !(bitmap & 2),
+      writable: !(bitmap & 4),
+      value: value
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("30", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(exec) {
+    try {
+      return !!exec();
+    } catch (e) {
+      return true;
+    }
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("31", ["30"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = !req('30')(function() {
+    return Object.defineProperty({}, 'a', {get: function() {
+        return 7;
+      }}).a != 7;
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("32", ["b", "2f", "31"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $ = req('b'),
+      createDesc = req('2f');
+  module.exports = req('31') ? function(object, key, value) {
+    return $.setDesc(object, key, createDesc(1, value));
+  } : function(object, key, value) {
+    object[key] = value;
+    return object;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("33", ["32"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('32');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("34", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var hasOwnProperty = {}.hasOwnProperty;
+  module.exports = function(it, key) {
+    return hasOwnProperty.call(it, key);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("35", ["1d"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var global = req('1d'),
+      SHARED = '__core-js_shared__',
+      store = global[SHARED] || (global[SHARED] = {});
+  module.exports = function(key) {
+    return store[key] || (store[key] = {});
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("36", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var id = 0,
+      px = Math.random();
+  module.exports = function(key) {
+    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("37", ["35", "1d", "36"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var store = req('35')('wks'),
+      Symbol = req('1d').Symbol;
+  module.exports = function(name) {
+    return store[name] || (store[name] = Symbol && Symbol[name] || (Symbol || req('36'))('Symbol.' + name));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("38", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {};
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("39", ["b", "34", "37"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var def = req('b').setDesc,
+      has = req('34'),
+      TAG = req('37')('toStringTag');
+  module.exports = function(it, tag, stat) {
+    if (it && !has(it = stat ? it : it.prototype, TAG))
+      def(it, TAG, {
+        configurable: true,
+        value: tag
+      });
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("3a", ["b", "32", "37", "2f", "39"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $ = req('b'),
+      IteratorPrototype = {};
+  req('32')(IteratorPrototype, req('37')('iterator'), function() {
+    return this;
+  });
+  module.exports = function(Constructor, NAME, next) {
+    Constructor.prototype = $.create(IteratorPrototype, {next: req('2f')(1, next)});
+    req('39')(Constructor, NAME + ' Iterator');
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("3b", ["2e", "1f", "33", "32", "34", "37", "38", "3a", "b", "39"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var LIBRARY = req('2e'),
+      $def = req('1f'),
+      $redef = req('33'),
+      hide = req('32'),
+      has = req('34'),
+      SYMBOL_ITERATOR = req('37')('iterator'),
+      Iterators = req('38'),
+      BUGGY = !([].keys && 'next' in [].keys()),
+      FF_ITERATOR = '@@iterator',
+      KEYS = 'keys',
+      VALUES = 'values';
+  var returnThis = function() {
+    return this;
+  };
+  module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE) {
+    req('3a')(Constructor, NAME, next);
+    var createMethod = function(kind) {
+      switch (kind) {
+        case KEYS:
+          return function keys() {
+            return new Constructor(this, kind);
+          };
+        case VALUES:
+          return function values() {
+            return new Constructor(this, kind);
+          };
+      }
+      return function entries() {
+        return new Constructor(this, kind);
+      };
+    };
+    var TAG = NAME + ' Iterator',
+        proto = Base.prototype,
+        _native = proto[SYMBOL_ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT],
+        _default = _native || createMethod(DEFAULT),
+        methods,
+        key;
+    if (_native) {
+      var IteratorPrototype = req('b').getProto(_default.call(new Base));
+      req('39')(IteratorPrototype, TAG, true);
+      if (!LIBRARY && has(proto, FF_ITERATOR))
+        hide(IteratorPrototype, SYMBOL_ITERATOR, returnThis);
+    }
+    if (!LIBRARY || FORCE)
+      hide(proto, SYMBOL_ITERATOR, _default);
+    Iterators[NAME] = _default;
+    Iterators[TAG] = returnThis;
+    if (DEFAULT) {
+      methods = {
+        values: DEFAULT == VALUES ? _default : createMethod(VALUES),
+        keys: IS_SET ? _default : createMethod(KEYS),
+        entries: DEFAULT != VALUES ? _default : createMethod('entries')
+      };
+      if (FORCE)
+        for (key in methods) {
+          if (!(key in proto))
+            $redef(proto, key, methods[key]);
+        }
+      else
+        $def($def.P + $def.F * BUGGY, NAME, methods);
+    }
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("3c", ["2d", "3b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $at = req('2d')(true);
+  req('3b')(String, 'String', function(iterated) {
+    this._t = String(iterated);
+    this._i = 0;
+  }, function() {
+    var O = this._t,
+        index = this._i,
+        point;
+    if (index >= O.length)
+      return {
+        value: undefined,
+        done: true
+      };
+    point = $at(O, index);
+    this._i += point.length;
+    return {
+      value: point,
+      done: false
+    };
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("3d", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function() {};
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("3e", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(done, value) {
+    return {
+      value: value,
+      done: !!done
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("3f", ["3d", "3e", "38", "23", "3b"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var setUnscope = req('3d'),
+      step = req('3e'),
+      Iterators = req('38'),
+      toIObject = req('23');
+  req('3b')(Array, 'Array', function(iterated, kind) {
+    this._t = toIObject(iterated);
+    this._i = 0;
+    this._k = kind;
+  }, function() {
+    var O = this._t,
+        kind = this._k,
+        index = this._i++;
+    if (!O || index >= O.length) {
+      this._t = undefined;
+      return step(1);
+    }
+    if (kind == 'keys')
+      return step(0, index);
+    if (kind == 'values')
+      return step(0, O[index]);
+    return step(0, [index, O[index]]);
+  }, 'values');
+  Iterators.Arguments = Iterators.Array;
+  setUnscope('keys');
+  setUnscope('values');
+  setUnscope('entries');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("40", ["3f", "38"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('3f');
+  var Iterators = req('38');
+  Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("41", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it) {
+    if (typeof it != 'function')
+      throw TypeError(it + ' is not a function!');
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("42", ["41"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var aFunction = req('41');
+  module.exports = function(fn, that, length) {
+    aFunction(fn);
+    if (that === undefined)
+      return fn;
+    switch (length) {
+      case 1:
+        return function(a) {
+          return fn.call(that, a);
+        };
+      case 2:
+        return function(a, b) {
+          return fn.call(that, a, b);
+        };
+      case 3:
+        return function(a, b, c) {
+          return fn.call(that, a, b, c);
+        };
+    }
+    return function() {
+      return fn.apply(that, arguments);
+    };
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("43", ["20", "37"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var cof = req('20'),
+      TAG = req('37')('toStringTag'),
+      ARG = cof(function() {
+        return arguments;
+      }()) == 'Arguments';
+  module.exports = function(it) {
+    var O,
+        T,
+        B;
+    return it === undefined ? 'Undefined' : it === null ? 'Null' : typeof(T = (O = Object(it))[TAG]) == 'string' ? T : ARG ? cof(O) : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("44", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it) {
+    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("45", ["44"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var isObject = req('44');
+  module.exports = function(it) {
+    if (!isObject(it))
+      throw TypeError(it + ' is not an object!');
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("46", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(it, Constructor, name) {
+    if (!(it instanceof Constructor))
+      throw TypeError(name + ": use the 'new' operator!");
+    return it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("47", ["45"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var anObject = req('45');
+  module.exports = function(iterator, fn, value, entries) {
+    try {
+      return entries ? fn(anObject(value)[0], value[1]) : fn(value);
+    } catch (e) {
+      var ret = iterator['return'];
+      if (ret !== undefined)
+        anObject(ret.call(iterator));
+      throw e;
+    }
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("48", ["38", "37"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var Iterators = req('38'),
+      ITERATOR = req('37')('iterator');
+  module.exports = function(it) {
+    return (Iterators.Array || Array.prototype[ITERATOR]) === it;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("49", ["2c"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toInteger = req('2c'),
+      min = Math.min;
+  module.exports = function(it) {
+    return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4a", ["43", "37", "38", "1e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var classof = req('43'),
+      ITERATOR = req('37')('iterator'),
+      Iterators = req('38');
+  module.exports = req('1e').getIteratorMethod = function(it) {
+    if (it != undefined)
+      return it[ITERATOR] || it['@@iterator'] || Iterators[classof(it)];
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4b", ["42", "47", "48", "45", "49", "4a"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var ctx = req('42'),
+      call = req('47'),
+      isArrayIter = req('48'),
+      anObject = req('45'),
+      toLength = req('49'),
+      getIterFn = req('4a');
+  module.exports = function(iterable, entries, fn, that) {
+    var iterFn = getIterFn(iterable),
+        f = ctx(fn, that, entries ? 2 : 1),
+        index = 0,
+        length,
+        step,
+        iterator;
+    if (typeof iterFn != 'function')
+      throw TypeError(iterable + ' is not iterable!');
+    if (isArrayIter(iterFn))
+      for (length = toLength(iterable.length); length > index; index++) {
+        entries ? f(anObject(step = iterable[index])[0], step[1]) : f(iterable[index]);
+      }
+    else
+      for (iterator = iterFn.call(iterable); !(step = iterator.next()).done; ) {
+        call(iterator, f, step.value, entries);
+      }
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4c", ["b", "44", "45", "42"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var getDesc = req('b').getDesc,
+      isObject = req('44'),
+      anObject = req('45');
+  var check = function(O, proto) {
+    anObject(O);
+    if (!isObject(proto) && proto !== null)
+      throw TypeError(proto + ": can't set as prototype!");
+  };
+  module.exports = {
+    set: Object.setPrototypeOf || ('__proto__' in {} ? function(test, buggy, set) {
+      try {
+        set = req('42')(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+        set(test, []);
+        buggy = !(test instanceof Array);
+      } catch (e) {
+        buggy = true;
+      }
+      return function setPrototypeOf(O, proto) {
+        check(O, proto);
+        if (buggy)
+          O.__proto__ = proto;
+        else
+          set(O, proto);
+        return O;
+      };
+    }({}, false) : undefined),
+    check: check
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4d", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = Object.is || function is(x, y) {
+    return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4e", ["b", "37", "31"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  'use strict';
+  var $ = req('b'),
+      SPECIES = req('37')('species');
+  module.exports = function(C) {
+    if (req('31') && !(SPECIES in C))
+      $.setDesc(C, SPECIES, {
+        configurable: true,
+        get: function() {
+          return this;
+        }
+      });
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("4f", ["45", "41", "37"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var anObject = req('45'),
+      aFunction = req('41'),
+      SPECIES = req('37')('species');
+  module.exports = function(O, D) {
+    var C = anObject(O).constructor,
+        S;
+    return C === undefined || (S = anObject(C)[SPECIES]) == undefined ? D : aFunction(S);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("50", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(fn, args, that) {
+    var un = that === undefined;
+    switch (args.length) {
+      case 0:
+        return un ? fn() : fn.call(that);
+      case 1:
+        return un ? fn(args[0]) : fn.call(that, args[0]);
+      case 2:
+        return un ? fn(args[0], args[1]) : fn.call(that, args[0], args[1]);
+      case 3:
+        return un ? fn(args[0], args[1], args[2]) : fn.call(that, args[0], args[1], args[2]);
+      case 4:
+        return un ? fn(args[0], args[1], args[2], args[3]) : fn.call(that, args[0], args[1], args[2], args[3]);
+    }
+    return fn.apply(that, args);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("51", ["1d"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('1d').document && document.documentElement;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("52", ["44", "1d"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var isObject = req('44'),
+      document = req('1d').document,
+      is = isObject(document) && isObject(document.createElement);
+  module.exports = function(it) {
+    return is ? document.createElement(it) : {};
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("53", [], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var process = module.exports = {};
+  var queue = [];
+  var draining = false;
+  var currentQueue;
+  var queueIndex = -1;
+  function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+      queue = currentQueue.concat(queue);
+    } else {
+      queueIndex = -1;
+    }
+    if (queue.length) {
+      drainQueue();
+    }
+  }
+  function drainQueue() {
+    if (draining) {
+      return;
+    }
+    var timeout = setTimeout(cleanUpNextTick);
+    draining = true;
+    var len = queue.length;
+    while (len) {
+      currentQueue = queue;
+      queue = [];
+      while (++queueIndex < len) {
+        if (currentQueue) {
+          currentQueue[queueIndex].run();
+        }
+      }
+      queueIndex = -1;
+      len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    clearTimeout(timeout);
+  }
+  process.nextTick = function(fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+      for (var i = 1; i < arguments.length; i++) {
+        args[i - 1] = arguments[i];
+      }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+      setTimeout(drainQueue, 0);
+    }
+  };
+  function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+  }
+  Item.prototype.run = function() {
+    this.fun.apply(null, this.array);
+  };
+  process.title = 'browser';
+  process.browser = true;
+  process.env = {};
+  process.argv = [];
+  process.version = '';
+  process.versions = {};
+  function noop() {}
+  process.on = noop;
+  process.addListener = noop;
+  process.once = noop;
+  process.off = noop;
+  process.removeListener = noop;
+  process.removeAllListeners = noop;
+  process.emit = noop;
+  process.binding = function(name) {
+    throw new Error('process.binding is not supported');
+  };
+  process.cwd = function() {
+    return '/';
+  };
+  process.chdir = function(dir) {
+    throw new Error('process.chdir is not supported');
+  };
+  process.umask = function() {
+    return 0;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("54", ["53"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('53');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("55", ["54"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = $__System._nodeRequire ? process : req('54');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("56", ["55"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = req('55');
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("57", ["42", "50", "51", "52", "1d", "20", "56"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  (function(process) {
+    'use strict';
+    var ctx = req('42'),
+        invoke = req('50'),
+        html = req('51'),
+        cel = req('52'),
+        global = req('1d'),
+        process = global.process,
+        setTask = global.setImmediate,
+        clearTask = global.clearImmediate,
+        MessageChannel = global.MessageChannel,
+        counter = 0,
+        queue = {},
+        ONREADYSTATECHANGE = 'onreadystatechange',
+        defer,
+        channel,
+        port;
+    var run = function() {
+      var id = +this;
+      if (queue.hasOwnProperty(id)) {
+        var fn = queue[id];
+        delete queue[id];
+        fn();
+      }
+    };
+    var listner = function(event) {
+      run.call(event.data);
+    };
+    if (!setTask || !clearTask) {
+      setTask = function setImmediate(fn) {
+        var args = [],
+            i = 1;
+        while (arguments.length > i)
+          args.push(arguments[i++]);
+        queue[++counter] = function() {
+          invoke(typeof fn == 'function' ? fn : Function(fn), args);
+        };
+        defer(counter);
+        return counter;
+      };
+      clearTask = function clearImmediate(id) {
+        delete queue[id];
+      };
+      if (req('20')(process) == 'process') {
+        defer = function(id) {
+          process.nextTick(ctx(run, id, 1));
+        };
+      } else if (MessageChannel) {
+        channel = new MessageChannel;
+        port = channel.port2;
+        channel.port1.onmessage = listner;
+        defer = ctx(port.postMessage, port, 1);
+      } else if (global.addEventListener && typeof postMessage == 'function' && !global.importScripts) {
+        defer = function(id) {
+          global.postMessage(id + '', '*');
+        };
+        global.addEventListener('message', listner, false);
+      } else if (ONREADYSTATECHANGE in cel('script')) {
+        defer = function(id) {
+          html.appendChild(cel('script'))[ONREADYSTATECHANGE] = function() {
+            html.removeChild(this);
+            run.call(id);
+          };
+        };
+      } else {
+        defer = function(id) {
+          setTimeout(ctx(run, id, 1), 0);
+        };
+      }
+    }
+    module.exports = {
+      set: setTask,
+      clear: clearTask
+    };
+  })(req('56'));
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("58", ["1d", "57", "20", "56"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  (function(process) {
+    var global = req('1d'),
+        macrotask = req('57').set,
+        Observer = global.MutationObserver || global.WebKitMutationObserver,
+        process = global.process,
+        isNode = req('20')(process) == 'process',
+        head,
+        last,
+        notify;
+    var flush = function() {
+      var parent,
+          domain;
+      if (isNode && (parent = process.domain)) {
+        process.domain = null;
+        parent.exit();
+      }
+      while (head) {
+        domain = head.domain;
+        if (domain)
+          domain.enter();
+        head.fn.call();
+        if (domain)
+          domain.exit();
+        head = head.next;
+      }
+      last = undefined;
+      if (parent)
+        parent.enter();
+    };
+    if (isNode) {
+      notify = function() {
+        process.nextTick(flush);
+      };
+    } else if (Observer) {
+      var toggle = 1,
+          node = document.createTextNode('');
+      new Observer(flush).observe(node, {characterData: true});
+      notify = function() {
+        node.data = toggle = -toggle;
+      };
+    } else {
+      notify = function() {
+        macrotask.call(global, flush);
+      };
+    }
+    module.exports = function asap(fn) {
+      var task = {
+        fn: fn,
+        next: undefined,
+        domain: isNode && process.domain
+      };
+      if (last)
+        last.next = task;
+      if (!head) {
+        head = task;
+        notify();
+      }
+      last = task;
+    };
+  })(req('56'));
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("59", ["33"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $redef = req('33');
+  module.exports = function(target, src) {
+    for (var key in src)
+      $redef(target, key, src[key]);
+    return target;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("5a", ["37"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var SYMBOL_ITERATOR = req('37')('iterator'),
+      SAFE_CLOSING = false;
+  try {
+    var riter = [7][SYMBOL_ITERATOR]();
+    riter['return'] = function() {
+      SAFE_CLOSING = true;
+    };
+    Array.from(riter, function() {
+      throw 2;
+    });
+  } catch (e) {}
+  module.exports = function(exec, skipClosing) {
+    if (!skipClosing && !SAFE_CLOSING)
+      return false;
+    var safe = false;
+    try {
+      var arr = [7],
+          iter = arr[SYMBOL_ITERATOR]();
+      iter.next = function() {
+        safe = true;
+      };
+      arr[SYMBOL_ITERATOR] = function() {
+        return iter;
+      };
+      exec(arr);
+    } catch (e) {}
+    return safe;
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("5b", ["b", "2e", "1d", "42", "43", "1f", "44", "45", "41", "46", "4b", "4c", "4d", "4e", "37", "4f", "36", "58", "31", "59", "39", "1e", "5a", "56"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  (function(process) {
+    'use strict';
+    var $ = req('b'),
+        LIBRARY = req('2e'),
+        global = req('1d'),
+        ctx = req('42'),
+        classof = req('43'),
+        $def = req('1f'),
+        isObject = req('44'),
+        anObject = req('45'),
+        aFunction = req('41'),
+        strictNew = req('46'),
+        forOf = req('4b'),
+        setProto = req('4c').set,
+        same = req('4d'),
+        species = req('4e'),
+        SPECIES = req('37')('species'),
+        speciesConstructor = req('4f'),
+        RECORD = req('36')('record'),
+        asap = req('58'),
+        PROMISE = 'Promise',
+        process = global.process,
+        isNode = classof(process) == 'process',
+        P = global[PROMISE],
+        Wrapper;
+    var testResolve = function(sub) {
+      var test = new P(function() {});
+      if (sub)
+        test.constructor = Object;
+      return P.resolve(test) === test;
+    };
+    var useNative = function() {
+      var works = false;
+      function P2(x) {
+        var self = new P(x);
+        setProto(self, P2.prototype);
+        return self;
+      }
+      try {
+        works = P && P.resolve && testResolve();
+        setProto(P2, P);
+        P2.prototype = $.create(P.prototype, {constructor: {value: P2}});
+        if (!(P2.resolve(5).then(function() {}) instanceof P2)) {
+          works = false;
+        }
+        if (works && req('31')) {
+          var thenableThenGotten = false;
+          P.resolve($.setDesc({}, 'then', {get: function() {
+              thenableThenGotten = true;
+            }}));
+          works = thenableThenGotten;
+        }
+      } catch (e) {
+        works = false;
+      }
+      return works;
+    }();
+    var isPromise = function(it) {
+      return isObject(it) && (useNative ? classof(it) == 'Promise' : RECORD in it);
+    };
+    var sameConstructor = function(a, b) {
+      if (LIBRARY && a === P && b === Wrapper)
+        return true;
+      return same(a, b);
+    };
+    var getConstructor = function(C) {
+      var S = anObject(C)[SPECIES];
+      return S != undefined ? S : C;
+    };
+    var isThenable = function(it) {
+      var then;
+      return isObject(it) && typeof(then = it.then) == 'function' ? then : false;
+    };
+    var notify = function(record, isReject) {
+      if (record.n)
+        return;
+      record.n = true;
+      var chain = record.c;
+      asap(function() {
+        var value = record.v,
+            ok = record.s == 1,
+            i = 0;
+        var run = function(react) {
+          var cb = ok ? react.ok : react.fail,
+              ret,
+              then;
+          try {
+            if (cb) {
+              if (!ok)
+                record.h = true;
+              ret = cb === true ? value : cb(value);
+              if (ret === react.P) {
+                react.rej(TypeError('Promise-chain cycle'));
+              } else if (then = isThenable(ret)) {
+                then.call(ret, react.res, react.rej);
+              } else
+                react.res(ret);
+            } else
+              react.rej(value);
+          } catch (err) {
+            react.rej(err);
+          }
+        };
+        while (chain.length > i)
+          run(chain[i++]);
+        chain.length = 0;
+        record.n = false;
+        if (isReject)
+          setTimeout(function() {
+            var promise = record.p,
+                handler,
+                console;
+            if (isUnhandled(promise)) {
+              if (isNode) {
+                process.emit('unhandledRejection', value, promise);
+              } else if (handler = global.onunhandledrejection) {
+                handler({
+                  promise: promise,
+                  reason: value
+                });
+              } else if ((console = global.console) && console.error) {
+                console.error('Unhandled promise rejection', value);
+              }
+            }
+            record.a = undefined;
+          }, 1);
+      });
+    };
+    var isUnhandled = function(promise) {
+      var record = promise[RECORD],
+          chain = record.a || record.c,
+          i = 0,
+          react;
+      if (record.h)
+        return false;
+      while (chain.length > i) {
+        react = chain[i++];
+        if (react.fail || !isUnhandled(react.P))
+          return false;
+      }
+      return true;
+    };
+    var $reject = function(value) {
+      var record = this;
+      if (record.d)
+        return;
+      record.d = true;
+      record = record.r || record;
+      record.v = value;
+      record.s = 2;
+      record.a = record.c.slice();
+      notify(record, true);
+    };
+    var $resolve = function(value) {
+      var record = this,
+          then;
+      if (record.d)
+        return;
+      record.d = true;
+      record = record.r || record;
+      try {
+        if (then = isThenable(value)) {
+          asap(function() {
+            var wrapper = {
+              r: record,
+              d: false
+            };
+            try {
+              then.call(value, ctx($resolve, wrapper, 1), ctx($reject, wrapper, 1));
+            } catch (e) {
+              $reject.call(wrapper, e);
+            }
+          });
+        } else {
+          record.v = value;
+          record.s = 1;
+          notify(record, false);
+        }
+      } catch (e) {
+        $reject.call({
+          r: record,
+          d: false
+        }, e);
+      }
+    };
+    if (!useNative) {
+      P = function Promise(executor) {
+        aFunction(executor);
+        var record = {
+          p: strictNew(this, P, PROMISE),
+          c: [],
+          a: undefined,
+          s: 0,
+          d: false,
+          v: undefined,
+          h: false,
+          n: false
+        };
+        this[RECORD] = record;
+        try {
+          executor(ctx($resolve, record, 1), ctx($reject, record, 1));
+        } catch (err) {
+          $reject.call(record, err);
+        }
+      };
+      req('59')(P.prototype, {
+        then: function then(onFulfilled, onRejected) {
+          var react = {
+            ok: typeof onFulfilled == 'function' ? onFulfilled : true,
+            fail: typeof onRejected == 'function' ? onRejected : false
+          };
+          var promise = react.P = new (speciesConstructor(this, P))(function(res, rej) {
+            react.res = res;
+            react.rej = rej;
+          });
+          aFunction(react.res);
+          aFunction(react.rej);
+          var record = this[RECORD];
+          record.c.push(react);
+          if (record.a)
+            record.a.push(react);
+          if (record.s)
+            notify(record, false);
+          return promise;
+        },
+        'catch': function(onRejected) {
+          return this.then(undefined, onRejected);
+        }
+      });
+    }
+    $def($def.G + $def.W + $def.F * !useNative, {Promise: P});
+    req('39')(P, PROMISE);
+    species(P);
+    species(Wrapper = req('1e')[PROMISE]);
+    $def($def.S + $def.F * !useNative, PROMISE, {reject: function reject(r) {
+        return new this(function(res, rej) {
+          rej(r);
+        });
+      }});
+    $def($def.S + $def.F * (!useNative || testResolve(true)), PROMISE, {resolve: function resolve(x) {
+        return isPromise(x) && sameConstructor(x.constructor, this) ? x : new this(function(res) {
+          res(x);
+        });
+      }});
+    $def($def.S + $def.F * !(useNative && req('5a')(function(iter) {
+      P.all(iter)['catch'](function() {});
+    })), PROMISE, {
+      all: function all(iterable) {
+        var C = getConstructor(this),
+            values = [];
+        return new C(function(res, rej) {
+          forOf(iterable, false, values.push, values);
+          var remaining = values.length,
+              results = Array(remaining);
+          if (remaining)
+            $.each.call(values, function(promise, index) {
+              C.resolve(promise).then(function(value) {
+                results[index] = value;
+                --remaining || res(results);
+              }, rej);
+            });
+          else
+            res(results);
+        });
+      },
+      race: function race(iterable) {
+        var C = getConstructor(this);
+        return new C(function(res, rej) {
+          forOf(iterable, false, function(promise) {
+            C.resolve(promise).then(res, rej);
+          });
+        });
+      }
+    });
+  })(req('56'));
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("5c", ["2b", "3c", "40", "5b", "1e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('2b');
+  req('3c');
+  req('40');
+  req('5b');
+  module.exports = req('1e').Promise;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("5d", ["5c"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('5c'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register("5e", ["5d"], function (_export) {
 	var _Promise;
 
 	return {
-		setters: [function (_f) {
-			_Promise = _f["default"];
+		setters: [function (_d) {
+			_Promise = _d["default"];
 		}],
 		execute: function () {
 			"use strict";
@@ -7943,12 +7328,163 @@ $__System.register("18", ["1f"], function (_export) {
 		}
 	};
 });
-$__System.register("1a", ["23", "1b", "1c"], function (_export) {
-  var emitter, _createClass, _classCallCheck, Notifier;
+$__System.register("16", ["2", "3", "10", "11", "12", "13", "14", "15", "17", "d", "2a", "e", "5e"], function (_export) {
+  var manipulation, traversing, template, cssHelpers, pageready, clazz, style, dimension, attributes, _Object$create, events, Logger, animation, Collection;
+
+  return {
+    setters: [function (_9) {
+      manipulation = _9["default"];
+    }, function (_7) {
+      traversing = _7["default"];
+    }, function (_) {
+      template = _["default"];
+    }, function (_2) {
+      cssHelpers = _2["default"];
+    }, function (_3) {
+      pageready = _3["default"];
+    }, function (_4) {
+      clazz = _4["default"];
+    }, function (_5) {
+      style = _5["default"];
+    }, function (_6) {
+      dimension = _6["default"];
+    }, function (_8) {
+      attributes = _8["default"];
+    }, function (_d) {
+      _Object$create = _d["default"];
+    }, function (_a) {
+      events = _a["default"];
+    }, function (_e) {
+      Logger = _e["default"];
+    }, function (_e2) {
+      animation = _e2["default"];
+    }],
+    execute: function () {
+      "use strict";
+
+      Collection = function Collection() {
+        var collection = _Object$create(Array.prototype);
+        collection = Array.apply(collection, arguments) || collection;
+        for (var method in Collection.prototype) {
+          if (Collection.prototype.hasOwnProperty(method)) {
+            collection[method] = Collection.prototype[method];
+          }
+        }
+        return collection;
+      };
+
+      /**
+      * Return a new Collection from the given array.
+      * @param array {Array} The array to be converted into a collection.
+      * @return {Collection} The created collection
+      */
+      Collection.fromArray = function (array) {
+        var collection = Collection.apply(null, array);
+        return collection;
+      };
+
+      /**
+      * Returns a collection of all elements descended from the given context on which it is invoked
+      * that match the specified group of CSS selectors.
+      * @param selector {String|HTMLElement|Collection|window|document} Group of selectors to match on.
+      */
+      Collection.query = function (selector, context) {
+        context = context || document;
+        if (typeof selector === "string") {
+          if (context.querySelectorAll) {
+            return Collection.fromArray(Array.prototype.slice.call(context.querySelectorAll(selector)));
+          }
+        } else if (cssHelpers.isSuportedElement(selector)) {
+          return Collection.fromArray([selector]);
+        }
+        return Collection.fromArray(Array.prototype.slice.call(selector));
+      };
+
+      /**
+      *
+      */
+      Collection.create = function (htmlString) {
+        var container = document.createElement('div');
+        container.innerHTML = htmlString;
+        var children = Array.prototype.slice.call(container.childNodes, 0);
+        children = children.filter(function (child) {
+          return cssHelpers.isSuportedElement(child);
+        });
+        return Collection.fromArray(children);
+      };
+
+      /**
+      * Adds a new method to the collection prototype.
+      *
+      * @param module {Map} Map containing the functions to be added.
+      *   The keys of the map are the names under wich the functions will be presents on the collection
+      *   and the values are the functions to be added.
+      * @param override {Boolean} Wether or not an an existing function should be overriden.
+      *
+      */
+      Collection.addModule = function (module, override) {
+        for (var name in module) {
+          if ((Collection.prototype[name] !== undefined || Array.prototype[name] !== undefined) && override !== true) {
+            Logger.warn("Method '" + name + "' already available.");
+          } else {
+            Collection.prototype[name] = module[name];
+          }
+        }
+      };
+
+      /**
+      * Adds a static method the collection
+      *
+      * @param module {Map} Map containing the functions to be added.
+      *   The keys of the map are the names under wich the functions will be presents on the collection
+      *   and the values are the functions to be added.
+      * @param override {Boolean} Wether or not an an existing function should be overriden.
+      *
+      */
+      Collection.addStaticModule = function (module, override) {
+        for (var name in module) {
+          if (this[name] !== undefined && override !== true) {
+            Logger.warn("Method '" + name + "' already available as static method.");
+          } else {
+            this[name] = module[name];
+          }
+        }
+      };
+
+      Collection.addModule(clazz);
+      Collection.addModule(style);
+      Collection.addModule(traversing);
+      Collection.addModule(attributes);
+      Collection.addModule({
+        find: traversing.find
+      }, true);
+      Collection.addModule(dimension);
+      Collection.addModule(events);
+      Collection.addModule(manipulation);
+      Collection.addModule(animation);
+      Collection.addModule({
+        template: template.template
+      });
+
+      Collection.addStaticModule({
+        template: {
+          addSpecial: template.addSpecial,
+          addSpecials: template.addSpecials,
+          removeSpecial: template.removeSpecial
+        }
+      });
+      Collection.addStaticModule(pageready);
+
+      _export("default", Collection);
+    }
+  };
+});
+$__System.register("5f", ["29", "1b", "1c"], function (_export) {
+  var Notifier, _createClass, _classCallCheck, Observable;
 
   return {
     setters: [function (_) {
-      emitter = _["default"];
+      Notifier = _["default"];
     }, function (_b) {
       _createClass = _b["default"];
     }, function (_c) {
@@ -7957,121 +7493,1311 @@ $__System.register("1a", ["23", "1b", "1c"], function (_export) {
     execute: function () {
       "use strict";
 
-      Notifier = (function () {
-        function Notifier() {
-          _classCallCheck(this, Notifier);
+      Observable = (function () {
+        function Observable() {
+          _classCallCheck(this, Observable);
 
-          this.$$subscribers = {};
-          this.$$counter = 1;
+          this.$$__notifier = new Notifier();
+          Object.observe(this, this.onChange.bind(this));
         }
 
-        _createClass(Notifier, [{
-          key: "registerEvent",
-          value: function registerEvent(type, callback, ctx, once) {
-            ctx = ctx || this;
-            this.$$subscribers[type] = this.$$subscribers[type] || [];
-            var listener = {
-              fn: callback,
-              fnCtx: function fnCtx() {
-                callback.apply(ctx, [].slice.call(arguments));
-              },
-              scope: ctx,
-              once: once
-            };
-            this.$$subscribers[type].push(listener);
-            return listener;
+        _createClass(Observable, [{
+          key: "onChange",
+          value: function onChange(changes) {
+
+            var eventName = null;
+            changes = this.extractPublicMembers(changes);
+
+            changes.forEach((function (change) {
+              eventName = change.name + "Change";
+              this.fireEvent(eventName, change);
+            }).bind(this));
+
+            if (changes.length > 0) {
+              this.fireEvent("change", changes);
+            }
+          }
+        }, {
+          key: "extractPublicMembers",
+          value: function extractPublicMembers(changes) {
+            var firstCharCode = null;
+            changes = changes.filter(function (change) {
+              firstCharCode = change.name.toLowerCase().charCodeAt(0);
+              return firstCharCode >= 97 && firstCharCode <= 122;
+            });
+            return changes;
+          }
+        }, {
+          key: "addListener",
+          value: function addListener(eventType, listener, context) {
+            this.$$__notifier.subscribe(eventType, listener, context);
+          }
+        }, {
+          key: "fireEvent",
+          value: function fireEvent(eventType, eventData) {
+            window.setTimeout(this.$$__notifier.notify.bind(this.$$__notifier, eventType, eventData), 0);
           }
         }, {
           key: "on",
-          value: function on(type, callback, ctx) {
-            return this.registerEvent(type, callback, ctx, false);
+          value: function on(eventType, listener, context) {
+            this.addListener(eventType, listener, context);
           }
         }, {
           key: "off",
-          value: function off(type, callback, ctx) {
-            ctx = ctx || this;
-            var removed = [];
-            this.$$subscribers[type] = this.$$subscribers[type] || [];
-            this.$$subscribers[type] = this.$$subscribers[type].filter(function (subscriber) {
-              if (!(subscriber.fn == callback && subscriber.scope == ctx)) {
-                removed.push(subscriber);
-                return true;
-              }
-            });
-            if (this.$$subscribers[type].length === 0) {
-              delete this.$$subscribers[type];
-            }
-            return removed;
+          value: function off(eventType, listener, context) {
+            this.$$__notifier.unsubscribe(eventType, listener, context);
           }
         }, {
           key: "once",
-          value: function once(type, callback, ctx) {
-            return this.registerEvent(type, callback, ctx, true);
-          }
-        }, {
-          key: "emit",
-          value: function emit(type, message) {
-
-            var removed = [];
-            this.$$subscribers[type] = this.$$subscribers[type] || [];
-            this.$$subscribers[type].forEach(function (subscriber, index) {
-              subscriber.fn.call(subscriber.scope, message);
-              if (subscriber.once === true) {
-                removed.push(subscriber);
-              }
-            });
-
-            var index = null;
-            removed.forEach(function (toRemove) {
-              index = this.$$subscribers[type].indexOf(toRemove);
-              this.$$subscribers[type].splice(index, 1);
-            }, this);
-
-            if (this.$$subscribers[type].length === 0) {
-              delete this.$$subscribers[type];
-            }
-
-            return removed;
-          }
-        }, {
-          key: "emitNative",
-          value: function emitNative(eventName, properties) {
-            emitter.emitNative.call(this, eventName, properties);
+          value: function once(eventType, listener, context) {
+            var that = this;
+            var callback = (function () {
+              listener.apply(context, [].slice.call(arguments));
+              this.off(eventType, callback);
+            }).bind(this);
+            this.addListener(eventType, callback, context);
           }
         }]);
 
-        return Notifier;
+        return Observable;
       })();
 
-      _export("default", Notifier);
+      _export("default", Observable);
     }
   };
 });
-$__System.register("1d", ["21", "25", "26", "27", "1b", "1c", "1a", "c"], function (_export) {
-  var utils, uriUtils, _inherits, _get, _createClass, _classCallCheck, Notifier, Logger, XHR;
+$__System.register('60', ['e'], function (_export) {
+
+  // https://github.com/flatiron/director
+  // Generated on Tue Dec 16 2014 12:13:47 GMT+0100 (CET) by Charlie Robbins, Paolo Fragomeni & the Contributors (Using Codesurgeon).
+  // Version 1.2.6
+  //
+
+  'use strict';
+
+  var Logger, scopeRouter, init;
+  return {
+    setters: [function (_e) {
+      Logger = _e['default'];
+    }],
+    execute: function () {
+      scopeRouter = {};
+      (function (exports) {
+
+        /*
+         * browser.js: Browser specific functionality for director.
+         *
+         * (C) 2011, Charlie Robbins, Paolo Fragomeni, & the Contributors.
+         * MIT LICENSE
+         *
+         */
+
+        var dloc = document.location;
+
+        function dlocHashEmpty() {
+          // Non-IE browsers return '' when the address bar shows '#'; Director's logic
+          // assumes both mean empty.
+          return dloc.hash === '' || dloc.hash === '#';
+        }
+
+        var listener = {
+          mode: 'modern',
+          hash: dloc.hash,
+          history: false,
+
+          check: function check() {
+            var h = dloc.hash;
+            if (h != this.hash) {
+              this.hash = h;
+              this.onHashChanged();
+            }
+          },
+
+          fire: function fire() {
+            if (this.mode === 'modern') {
+              this.history === true ? window.onpopstate() : window.onhashchange();
+            } else {
+              this.onHashChanged();
+            }
+          },
+
+          init: function init(fn, history) {
+            var self = this;
+            this.history = history;
+
+            if (!Router.listeners) {
+              Router.listeners = [];
+            }
+
+            function onchange(onChangeEvent) {
+              for (var i = 0, l = Router.listeners.length; i < l; i++) {
+                Router.listeners[i](onChangeEvent);
+              }
+            }
+
+            //note IE8 is being counted as 'modern' because it has the hashchange event
+            if ('onhashchange' in window && (document.documentMode === undefined || document.documentMode > 7)) {
+              // At least for now HTML5 history is available for 'modern' browsers only
+              if (this.history === true) {
+                // There is an old bug in Chrome that causes onpopstate to fire even
+                // upon initial page load. Since the handler is run manually in init(),
+                // this would cause Chrome to run it twise. Currently the only
+                // workaround seems to be to set the handler after the initial page load
+                // http://code.google.com/p/chromium/issues/detail?id=63040
+                setTimeout(function () {
+                  window.onpopstate = onchange;
+                }, 500);
+              } else {
+                window.onhashchange = onchange;
+              }
+              this.mode = 'modern';
+            } else {
+              //
+              // IE support, based on a concept by Erik Arvidson ...
+              //
+              var frame = document.createElement('iframe');
+              frame.id = 'state-frame';
+              frame.style.display = 'none';
+              document.body.appendChild(frame);
+              this.writeFrame('');
+
+              if ('onpropertychange' in document && 'attachEvent' in document) {
+                document.attachEvent('onpropertychange', function () {
+                  if (event.propertyName === 'location') {
+                    self.check();
+                  }
+                });
+              }
+
+              window.setInterval(function () {
+                self.check();
+              }, 50);
+
+              this.onHashChanged = onchange;
+              this.mode = 'legacy';
+            }
+
+            Router.listeners.push(fn);
+
+            return this.mode;
+          },
+
+          destroy: function destroy(fn) {
+            if (!Router || !Router.listeners) {
+              return;
+            }
+
+            var listeners = Router.listeners;
+
+            for (var i = listeners.length - 1; i >= 0; i--) {
+              if (listeners[i] === fn) {
+                listeners.splice(i, 1);
+              }
+            }
+          },
+
+          setHash: function setHash(s) {
+            // Mozilla always adds an entry to the history
+            if (this.mode === 'legacy') {
+              this.writeFrame(s);
+            }
+
+            if (this.history === true) {
+              window.history.pushState({}, document.title, s);
+              // Fire an onpopstate event manually since pushing does not obviously
+              // trigger the pop event.
+              this.fire();
+            } else {
+              dloc.hash = s[0] === '/' ? s : '/' + s;
+            }
+            return this;
+          },
+
+          writeFrame: function writeFrame(s) {
+            // IE support...
+            var f = document.getElementById('state-frame');
+            var d = f.contentDocument || f.contentWindow.document;
+            d.open();
+            d.write("<script>_hash = '" + s + "'; onload = parent.listener.syncHash;<script>");
+            d.close();
+          },
+
+          syncHash: function syncHash() {
+            // IE support...
+            var s = this._hash;
+            if (s != dloc.hash) {
+              dloc.hash = s;
+            }
+            return this;
+          },
+
+          onHashChanged: function onHashChanged() {}
+        };
+
+        var Router = exports.Router = function (routes) {
+          if (!(this instanceof Router)) return new Router(routes);
+
+          this.params = {};
+          this.routes = {};
+          this.methods = ['on', 'once', 'after', 'before'];
+          this.scope = [];
+          this._methods = {};
+
+          this._insert = this.insert;
+          this.insert = this.insertEx;
+
+          this.historySupport = (window.history != null ? window.history.pushState : null) != null;
+
+          this.configure();
+          this.mount(routes || {});
+        };
+
+        Router.prototype.init = function (r) {
+          var self = this,
+              routeTo;
+          this.handler = function (onChangeEvent) {
+            var newURL = onChangeEvent && onChangeEvent.newURL || window.location.hash;
+            var url = self.history === true ? self.getPath() : newURL.replace(/.*#/, '');
+            self.dispatch('on', url.charAt(0) === '/' ? url : '/' + url);
+          };
+
+          listener.init(this.handler, this.history);
+
+          if (this.history === false) {
+            if (dlocHashEmpty() && r) {
+              dloc.hash = r;
+            } else if (!dlocHashEmpty()) {
+              self.dispatch('on', '/' + dloc.hash.replace(/^(#\/|#|\/)/, ''));
+            }
+          } else {
+            if (this.convert_hash_in_init) {
+              // Use hash as route
+              routeTo = dlocHashEmpty() && r ? r : !dlocHashEmpty() ? dloc.hash.replace(/^#/, '') : null;
+              if (routeTo) {
+                window.history.replaceState({}, document.title, routeTo);
+              }
+            } else {
+              // Use canonical url
+              routeTo = this.getPath();
+            }
+
+            // Router has been initialized, but due to the chrome bug it will not
+            // yet actually route HTML5 history state changes. Thus, decide if should route.
+            if (routeTo || this.run_in_init === true) {
+              this.handler();
+            }
+          }
+
+          return this;
+        };
+
+        Router.prototype.explode = function () {
+          var v = this.history === true ? this.getPath() : dloc.hash;
+          if (v.charAt(1) === '/') {
+            v = v.slice(1);
+          }
+          return v.slice(1, v.length).split("/");
+        };
+
+        Router.prototype.setRoute = function (i, v, val) {
+          var url = this.explode();
+
+          if (typeof i === 'number' && typeof v === 'string') {
+            url[i] = v;
+          } else if (typeof val === 'string') {
+            url.splice(i, v, s);
+          } else {
+            url = [i];
+          }
+
+          listener.setHash(url.join('/'));
+          return url;
+        };
+
+        //
+        // ### function insertEx(method, path, route, parent)
+        // #### @method {string} Method to insert the specific `route`.
+        // #### @path {Array} Parsed path to insert the `route` at.
+        // #### @route {Array|function} Route handlers to insert.
+        // #### @parent {Object} **Optional** Parent "routes" to insert into.
+        // insert a callback that will only occur once per the matched route.
+        //
+        Router.prototype.insertEx = function (method, path, route, parent) {
+          if (method === "once") {
+            method = "on";
+            route = (function (route) {
+              var once = false;
+              return function () {
+                if (once) return;
+                once = true;
+                return route.apply(this, arguments);
+              };
+            })(route);
+          }
+          return this._insert(method, path, route, parent);
+        };
+
+        Router.prototype.getRoute = function (v) {
+          var ret = v;
+
+          if (typeof v === "number") {
+            ret = this.explode()[v];
+          } else if (typeof v === "string") {
+            var h = this.explode();
+            ret = h.indexOf(v);
+          } else {
+            ret = this.explode();
+          }
+
+          return ret;
+        };
+
+        Router.prototype.destroy = function () {
+          listener.destroy(this.handler);
+          return this;
+        };
+
+        Router.prototype.getPath = function () {
+          var path = window.location.pathname;
+          if (path.substr(0, 1) !== '/') {
+            path = '/' + path;
+          }
+          return path;
+        };
+
+        function _every(arr, iterator) {
+          for (var i = 0; i < arr.length; i += 1) {
+            if (iterator(arr[i], i, arr) === false) {
+              return;
+            }
+          }
+        }
+
+        function _flatten(arr) {
+          var flat = [];
+          for (var i = 0, n = arr.length; i < n; i++) {
+            flat = flat.concat(arr[i]);
+          }
+          return flat;
+        }
+
+        function _asyncEverySeries(arr, iterator, callback) {
+          if (!arr.length) {
+            return callback();
+          }
+          var completed = 0;
+          (function iterate() {
+            iterator(arr[completed], function (err) {
+              if (err || err === false) {
+                callback(err);
+                callback = function () {};
+              } else {
+                completed += 1;
+                if (completed === arr.length) {
+                  callback();
+                } else {
+                  iterate();
+                }
+              }
+            });
+          })();
+        }
+
+        function paramifyString(str, params, mod) {
+          mod = str;
+          for (var param in params) {
+            if (params.hasOwnProperty(param)) {
+              mod = params[param](str);
+              if (mod !== str) {
+                break;
+              }
+            }
+          }
+          return mod === str ? "([._a-zA-Z0-9-%()]+)" : mod;
+        }
+
+        function regifyString(str, params) {
+          var matches,
+              last = 0,
+              out = "";
+          while (matches = str.substr(last).match(/[^\w\d\- %@&]*\*[^\w\d\- %@&]*/)) {
+            last = matches.index + matches[0].length;
+            matches[0] = matches[0].replace(/^\*/, "([_.()!\\ %@&a-zA-Z0-9-]+)");
+            out += str.substr(0, matches.index) + matches[0];
+          }
+          str = out += str.substr(last);
+          var captures = str.match(/:([^\/]+)/ig),
+              capture,
+              length;
+          if (captures) {
+            length = captures.length;
+            for (var i = 0; i < length; i++) {
+              capture = captures[i];
+              if (capture.slice(0, 2) === "::") {
+                str = capture.slice(1);
+              } else {
+                str = str.replace(capture, paramifyString(capture, params));
+              }
+            }
+          }
+          return str;
+        }
+
+        function terminator(routes, delimiter, start, stop) {
+          var last = 0,
+              left = 0,
+              right = 0,
+              start = (start || "(").toString(),
+              stop = (stop || ")").toString(),
+              i;
+          for (i = 0; i < routes.length; i++) {
+            var chunk = routes[i];
+            if (chunk.indexOf(start, last) > chunk.indexOf(stop, last) || ~chunk.indexOf(start, last) && ! ~chunk.indexOf(stop, last) || ! ~chunk.indexOf(start, last) && ~chunk.indexOf(stop, last)) {
+              left = chunk.indexOf(start, last);
+              right = chunk.indexOf(stop, last);
+              if (~left && ! ~right || ! ~left && ~right) {
+                var tmp = routes.slice(0, (i || 1) + 1).join(delimiter);
+                routes = [tmp].concat(routes.slice((i || 1) + 1));
+              }
+              last = (right > left ? right : left) + 1;
+              i = 0;
+            } else {
+              last = 0;
+            }
+          }
+          return routes;
+        }
+
+        var QUERY_SEPARATOR = /\?.*/;
+
+        Router.prototype.configure = function (options) {
+          options = options || {};
+          for (var i = 0; i < this.methods.length; i++) {
+            this._methods[this.methods[i]] = true;
+          }
+          this.recurse = options.recurse || this.recurse || false;
+          this.async = options.async || false;
+          this.delimiter = options.delimiter || "/";
+          this.strict = typeof options.strict === "undefined" ? true : options.strict;
+          this.notfound = options.notfound;
+          this.resource = options.resource;
+          this.history = options.html5history && this.historySupport || false;
+          this.run_in_init = this.history === true && options.run_handler_in_init !== false;
+          this.convert_hash_in_init = this.history === true && options.convert_hash_in_init !== false;
+          this.every = {
+            after: options.after || null,
+            before: options.before || null,
+            on: options.on || null
+          };
+          return this;
+        };
+
+        Router.prototype.param = function (token, matcher) {
+          if (token[0] !== ":") {
+            token = ":" + token;
+          }
+          var compiled = new RegExp(token, "g");
+          this.params[token] = function (str) {
+            return str.replace(compiled, matcher.source || matcher);
+          };
+          return this;
+        };
+
+        Router.prototype.on = Router.prototype.route = function (method, path, route) {
+          var self = this;
+          if (!route && typeof path == "function") {
+            route = path;
+            path = method;
+            method = "on";
+          }
+          if (Array.isArray(path)) {
+            return path.forEach(function (p) {
+              self.on(method, p, route);
+            });
+          }
+          if (path.source) {
+            path = path.source.replace(/\\\//ig, "/");
+          }
+          if (Array.isArray(method)) {
+            return method.forEach(function (m) {
+              self.on(m.toLowerCase(), path, route);
+            });
+          }
+          path = path.split(new RegExp(this.delimiter));
+          path = terminator(path, this.delimiter);
+          this.insert(method, this.scope.concat(path), route);
+        };
+
+        Router.prototype.path = function (path, routesFn) {
+          var self = this,
+              length = this.scope.length;
+          if (path.source) {
+            path = path.source.replace(/\\\//ig, "/");
+          }
+          path = path.split(new RegExp(this.delimiter));
+          path = terminator(path, this.delimiter);
+          this.scope = this.scope.concat(path);
+          routesFn.call(this, this);
+          this.scope.splice(length, path.length);
+        };
+
+        Router.prototype.dispatch = function (method, path, callback) {
+          var self = this,
+              fns = this.traverse(method, path.replace(QUERY_SEPARATOR, ""), this.routes, ""),
+              invoked = this._invoked,
+              after;
+          this._invoked = true;
+          if (!fns || fns.length === 0) {
+            this.last = [];
+            if (typeof this.notfound === "function") {
+              this.invoke([this.notfound], {
+                method: method,
+                path: path
+              }, callback);
+            }
+            return false;
+          }
+          if (this.recurse === "forward") {
+            fns = fns.reverse();
+          }
+
+          function updateAndInvoke() {
+            self.last = fns.after;
+            self.invoke(self.runlist(fns), self, callback);
+          }
+          after = this.every && this.every.after ? [this.every.after].concat(this.last) : [this.last];
+          if (after && after.length > 0 && invoked) {
+            if (this.async) {
+              this.invoke(after, this, updateAndInvoke);
+            } else {
+              this.invoke(after, this);
+              updateAndInvoke();
+            }
+            return true;
+          }
+          updateAndInvoke();
+          return true;
+        };
+
+        Router.prototype.invoke = function (fns, thisArg, callback) {
+          var self = this;
+          var apply;
+          if (this.async) {
+            apply = function (fn, next) {
+              if (Array.isArray(fn)) {
+                return _asyncEverySeries(fn, apply, next);
+              } else if (typeof fn == "function") {
+                fn.apply(thisArg, (fns.captures || []).concat(next));
+              }
+            };
+            _asyncEverySeries(fns, apply, function () {
+              if (callback) {
+                callback.apply(thisArg, arguments);
+              }
+            });
+          } else {
+            apply = function (fn) {
+              if (Array.isArray(fn)) {
+                return _every(fn, apply);
+              } else if (typeof fn === "function") {
+                return fn.apply(thisArg, fns.captures || []);
+              } else if (typeof fn === "string" && self.resource) {
+                self.resource[fn].apply(thisArg, fns.captures || []);
+              }
+            };
+            _every(fns, apply);
+          }
+        };
+
+        Router.prototype.traverse = function (method, path, routes, regexp, filter) {
+          var fns = [],
+              current,
+              exact,
+              match,
+              next,
+              that;
+
+          function filterRoutes(routes) {
+            if (!filter) {
+              return routes;
+            }
+
+            function deepCopy(source) {
+              var result = [];
+              for (var i = 0; i < source.length; i++) {
+                result[i] = Array.isArray(source[i]) ? deepCopy(source[i]) : source[i];
+              }
+              return result;
+            }
+
+            function applyFilter(fns) {
+              for (var i = fns.length - 1; i >= 0; i--) {
+                if (Array.isArray(fns[i])) {
+                  applyFilter(fns[i]);
+                  if (fns[i].length === 0) {
+                    fns.splice(i, 1);
+                  }
+                } else {
+                  if (!filter(fns[i])) {
+                    fns.splice(i, 1);
+                  }
+                }
+              }
+            }
+            var newRoutes = deepCopy(routes);
+            newRoutes.matched = routes.matched;
+            newRoutes.captures = routes.captures;
+            newRoutes.after = routes.after.filter(filter);
+            applyFilter(newRoutes);
+            return newRoutes;
+          }
+          if (path === this.delimiter && routes[method]) {
+            next = [[routes.before, routes[method]].filter(Boolean)];
+            next.after = [routes.after].filter(Boolean);
+            next.matched = true;
+            next.captures = [];
+            return filterRoutes(next);
+          }
+          for (var r in routes) {
+            if (routes.hasOwnProperty(r) && (!this._methods[r] || this._methods[r] && typeof routes[r] === "object" && !Array.isArray(routes[r]))) {
+              current = exact = regexp + this.delimiter + r;
+              if (!this.strict) {
+                exact += "[" + this.delimiter + "]?";
+              }
+              match = path.match(new RegExp("^" + exact));
+              if (!match) {
+                continue;
+              }
+              if (match[0] && match[0] == path && routes[r][method]) {
+                next = [[routes[r].before, routes[r][method]].filter(Boolean)];
+                next.after = [routes[r].after].filter(Boolean);
+                next.matched = true;
+                next.captures = match.slice(1);
+                if (this.recurse && routes === this.routes) {
+                  next.push([routes.before, routes.on].filter(Boolean));
+                  next.after = next.after.concat([routes.after].filter(Boolean));
+                }
+                return filterRoutes(next);
+              }
+              next = this.traverse(method, path, routes[r], current);
+              if (next.matched) {
+                if (next.length > 0) {
+                  fns = fns.concat(next);
+                }
+                if (this.recurse) {
+                  fns.push([routes[r].before, routes[r].on].filter(Boolean));
+                  next.after = next.after.concat([routes[r].after].filter(Boolean));
+                  if (routes === this.routes) {
+                    fns.push([routes["before"], routes["on"]].filter(Boolean));
+                    next.after = next.after.concat([routes["after"]].filter(Boolean));
+                  }
+                }
+                fns.matched = true;
+                fns.captures = next.captures;
+                fns.after = next.after;
+                return filterRoutes(fns);
+              }
+            }
+          }
+          return false;
+        };
+
+        Router.prototype.insert = function (method, path, route, parent) {
+          var methodType, parentType, isArray, nested, part;
+          path = path.filter(function (p) {
+            return p && p.length > 0;
+          });
+          parent = parent || this.routes;
+          part = path.shift();
+          if (/\:|\*/.test(part) && !/\\d|\\w/.test(part)) {
+            part = regifyString(part, this.params);
+          }
+          if (path.length > 0) {
+            parent[part] = parent[part] || {};
+            return this.insert(method, path, route, parent[part]);
+          }
+          if (!part && !path.length && parent === this.routes) {
+            methodType = typeof parent[method];
+            switch (methodType) {
+              case "function":
+                parent[method] = [parent[method], route];
+                return;
+              case "object":
+                parent[method].push(route);
+                return;
+              case "undefined":
+                parent[method] = route;
+                return;
+            }
+            return;
+          }
+          parentType = typeof parent[part];
+          isArray = Array.isArray(parent[part]);
+          if (parent[part] && !isArray && parentType == "object") {
+            methodType = typeof parent[part][method];
+            switch (methodType) {
+              case "function":
+                parent[part][method] = [parent[part][method], route];
+                return;
+              case "object":
+                parent[part][method].push(route);
+                return;
+              case "undefined":
+                parent[part][method] = route;
+                return;
+            }
+          } else if (parentType == "undefined") {
+            nested = {};
+            nested[method] = route;
+            parent[part] = nested;
+            return;
+          }
+          throw new Error("Invalid route context: " + parentType);
+        };
+
+        Router.prototype.extend = function (methods) {
+          var self = this,
+              len = methods.length,
+              i;
+
+          function extend(method) {
+            self._methods[method] = true;
+            self[method] = function () {
+              var extra = arguments.length === 1 ? [method, ""] : [method];
+              self.on.apply(self, extra.concat(Array.prototype.slice.call(arguments)));
+            };
+          }
+          for (i = 0; i < len; i++) {
+            extend(methods[i]);
+          }
+        };
+
+        Router.prototype.runlist = function (fns) {
+          var runlist = this.every && this.every.before ? [this.every.before].concat(_flatten(fns)) : _flatten(fns);
+          if (this.every && this.every.on) {
+            runlist.push(this.every.on);
+          }
+          runlist.captures = fns.captures;
+          runlist.source = fns.source;
+          return runlist;
+        };
+
+        Router.prototype.mount = function (routes, path) {
+          if (!routes || typeof routes !== "object" || Array.isArray(routes)) {
+            return;
+          }
+          var self = this;
+          path = path || [];
+          if (!Array.isArray(path)) {
+            path = path.split(self.delimiter);
+          }
+
+          function insertOrMount(route, local) {
+            var rename = route,
+                parts = route.split(self.delimiter),
+                routeType = typeof routes[route],
+                isRoute = parts[0] === "" || !self._methods[parts[0]],
+                event = isRoute ? "on" : rename;
+            if (isRoute) {
+              rename = rename.slice((rename.match(new RegExp("^" + self.delimiter)) || [""])[0].length);
+              parts.shift();
+            }
+            if (isRoute && routeType === "object" && !Array.isArray(routes[route])) {
+              local = local.concat(parts);
+              self.mount(routes[route], local);
+              return;
+            }
+            if (isRoute) {
+              local = local.concat(rename.split(self.delimiter));
+              local = terminator(local, self.delimiter);
+            }
+            self.insert(event, local, routes[route]);
+          }
+          for (var route in routes) {
+            if (routes.hasOwnProperty(route)) {
+              insertOrMount(route, path.slice(0));
+            }
+          }
+        };
+      })(typeof exports === "object" ? exports : scopeRouter);
+
+      init = scopeRouter.Router.prototype.init;
+
+      scopeRouter.Router.prototype.init = function (redirect) {
+
+        redirect = redirect || "/";
+
+        init.apply(this, arguments);
+
+        var initialRoute = window.location.hash.slice(2);
+        if (initialRoute) {
+          window.setTimeout(function () {
+            if (typeof HashChangeEvent != "undefined") {
+              window.dispatchEvent(new HashChangeEvent("hashchange"));
+            } else {
+              var evt = document.createEvent("Event");
+              evt.initEvent("hashchange", true, false);
+              window.dispatchEvent(evt);
+            }
+          }, 0);
+        }
+
+        window.addEventListener("hashchange", (function (e) {
+          var currRoute = this.getRoute();
+          if (currRoute[0].length && !this.routes[currRoute[0]]) {
+            Logger.warn("The route '#/" + currRoute + "' does not exists ! Redirected to '#" + redirect + "'");
+            this.setRoute(redirect);
+          }
+        }).bind(this), false);
+
+        return this;
+      };
+
+      _export('default', scopeRouter);
+    }
+  };
+});
+$__System.registerDynamic("61", ["22"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var defined = req('22');
+  module.exports = function(it) {
+    return Object(defined(it));
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("62", ["b", "61", "21", "30"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $ = req('b'),
+      toObject = req('61'),
+      IObject = req('21');
+  module.exports = req('30')(function() {
+    var a = Object.assign,
+        A = {},
+        B = {},
+        S = Symbol(),
+        K = 'abcdefghijklmnopqrst';
+    A[S] = 7;
+    K.split('').forEach(function(k) {
+      B[k] = k;
+    });
+    return a({}, A)[S] != 7 || Object.keys(a({}, B)).join('') != K;
+  }) ? function assign(target, source) {
+    var T = toObject(target),
+        $$ = arguments,
+        $$len = $$.length,
+        index = 1,
+        getKeys = $.getKeys,
+        getSymbols = $.getSymbols,
+        isEnum = $.isEnum;
+    while ($$len > index) {
+      var S = IObject($$[index++]),
+          keys = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S),
+          length = keys.length,
+          j = 0,
+          key;
+      while (length > j)
+        if (isEnum.call(S, key = keys[j++]))
+          T[key] = S[key];
+    }
+    return T;
+  } : Object.assign;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("63", ["1f", "62"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $def = req('1f');
+  $def($def.S + $def.F, 'Object', {assign: req('62')});
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("64", ["63", "1e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('63');
+  module.exports = req('1e').Object.assign;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("65", ["64"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('64'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("66", ["1f", "1e", "30"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = function(KEY, exec) {
+    var $def = req('1f'),
+        fn = (req('1e').Object || {})[KEY] || Object[KEY],
+        exp = {};
+    exp[KEY] = exec(fn);
+    $def($def.S + $def.F * req('30')(function() {
+      fn(1);
+    }), 'Object', exp);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("67", ["23", "66"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var toIObject = req('23');
+  req('66')('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor) {
+    return function getOwnPropertyDescriptor(it, key) {
+      return $getOwnPropertyDescriptor(toIObject(it), key);
+    };
+  });
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("68", ["b", "67"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $ = req('b');
+  req('67');
+  module.exports = function getOwnPropertyDescriptor(it, key) {
+    return $.getDesc(it, key);
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("69", ["68"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('68'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6a", ["69"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  var _Object$getOwnPropertyDescriptor = req('69')["default"];
+  exports["default"] = function get(_x, _x2, _x3) {
+    var _again = true;
+    _function: while (_again) {
+      var object = _x,
+          property = _x2,
+          receiver = _x3;
+      _again = false;
+      if (object === null)
+        object = Function.prototype;
+      var desc = _Object$getOwnPropertyDescriptor(object, property);
+      if (desc === undefined) {
+        var parent = Object.getPrototypeOf(object);
+        if (parent === null) {
+          return undefined;
+        } else {
+          _x = parent;
+          _x2 = property;
+          _x3 = receiver;
+          _again = true;
+          desc = parent = undefined;
+          continue _function;
+        }
+      } else if ("value" in desc) {
+        return desc.value;
+      } else {
+        var getter = desc.get;
+        if (getter === undefined) {
+          return undefined;
+        }
+        return getter.call(receiver);
+      }
+    }
+  };
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6b", ["1f", "4c"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  var $def = req('1f');
+  $def($def.S, 'Object', {setPrototypeOf: req('4c').set});
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6c", ["6b", "1e"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  req('6b');
+  module.exports = req('1e').Object.setPrototypeOf;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6d", ["6c"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  module.exports = {
+    "default": req('6c'),
+    __esModule: true
+  };
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.registerDynamic("6e", ["d", "6d"], true, function(req, exports, module) {
+  ;
+  var global = this,
+      __define = global.define;
+  global.define = undefined;
+  "use strict";
+  var _Object$create = req('d')["default"];
+  var _Object$setPrototypeOf = req('6d')["default"];
+  exports["default"] = function(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+    subClass.prototype = _Object$create(superClass && superClass.prototype, {constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }});
+    if (superClass)
+      _Object$setPrototypeOf ? _Object$setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  };
+  exports.__esModule = true;
+  global.define = __define;
+  return module.exports;
+});
+
+$__System.register("6f", ["f", "e"], function (_export) {
+  "use strict";
+
+  var utils, Logger;
+  return {
+    setters: [function (_f) {
+      utils = _f["default"];
+    }, function (_e) {
+      Logger = _e["default"];
+    }],
+    execute: function () {
+      _export("default", {
+
+        /**
+         * Split URL
+         *
+         * Code taken from:
+         *   parseUri 1.2.2
+         *   (c) Steven Levithan <stevenlevithan.com>
+         *   MIT License
+         *
+         *
+         * @param str {String} String to parse as URI
+         * @param strict {Boolean} Whether to parse strictly by the rules
+         * @return {Object} Map with parts of URI as properties
+         */
+        parseUri: function parseUri(str, strict) {
+
+          var options = {
+            key: ["source", "protocol", "authority", "userInfo", "user", "password", "host", "port", "relative", "path", "directory", "file", "query", "anchor"],
+            q: {
+              name: "queryKey",
+              parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+            },
+            parser: {
+              strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+              loose: /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+            }
+          };
+
+          var o = options,
+              m = options.parser[strict ? "strict" : "loose"].exec(str),
+              uri = {},
+              i = 14;
+
+          while (i--) {
+            uri[o.key[i]] = m[i] || "";
+          }
+          uri[o.q.name] = {};
+          uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+            if ($1) {
+              uri[o.q.name][$1] = $2;
+            }
+          });
+
+          return uri;
+        },
+
+        /**
+         * Append string to query part of URL. Respects existing query.
+         *
+         * @param url {String} URL to append string to.
+         * @param params {String} Parameters to append to URL.
+         * @return {String} URL with string appended in query part.
+         */
+        appendParamsToUrl: function appendParamsToUrl(url, params) {
+
+          if (params === undefined) {
+            return url;
+          }
+
+          var paramType = utils.getType(params);
+
+          if (!(paramType == "String" || paramType == "Object")) {
+            Logger.error("params must be either string or object");
+          }
+
+          if (paramType == "Object") {
+            params = this.toParameter(params);
+          }
+
+          if (!params) {
+            return url;
+          }
+
+          return url += /\?/.test(url) ? "&" + params : "?" + params;
+        },
+
+        /**
+         * Serializes an object to URI parameters (also known as query string).
+         *
+         * Escapes characters that have a special meaning in URIs as well as
+         * umlauts. Uses the global function encodeURIComponent, see
+         * https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/encodeURIComponent
+         *
+         * Note: For URI parameters that are to be sent as
+         * application/x-www-form-urlencoded (POST), spaces should be encoded
+         * with "+".
+         *
+         * @param obj {Object}   Object to serialize.
+         * @param post {Boolean} Whether spaces should be encoded with "+".
+         * @return {String}      Serialized object. Safe to append to URIs or send as
+         *                       URL encoded string.
+         */
+        toParameter: function toParameter(obj, post) {
+          var key,
+              parts = [];
+
+          for (key in obj) {
+            if (obj.hasOwnProperty(key)) {
+              var value = obj[key];
+              if (value instanceof Array) {
+                for (var i = 0; i < value.length; i++) {
+                  this.__toParameterPair(key, value[i], parts, post);
+                }
+              } else {
+                this.__toParameterPair(key, value, parts, post);
+              }
+            }
+          }
+
+          return parts.join("&");
+        },
+
+        /**
+         * Encodes key/value to URI safe string and pushes to given array.
+         *
+         * @param key {String} Key.
+         * @param value {String} Value.
+         * @param parts {Array} Array to push to.
+         * @param post {Boolean} Whether spaces should be encoded with "+".
+         */
+        __toParameterPair: function __toParameterPair(key, value, parts, post) {
+          var encode = window.encodeURIComponent;
+          if (post) {
+            parts.push(encode(key).replace(/%20/g, "+") + "=" + encode(value).replace(/%20/g, "+"));
+          } else {
+            parts.push(encode(key) + "=" + encode(value));
+          }
+        },
+
+        /**
+         * Takes a relative URI and returns an absolute one.
+         *
+         * @param uri {String} relative URI
+         * @return {String} absolute URI
+         */
+        getAbsolute: function getAbsolute(uri) {
+          var div = document.createElement("div");
+          div.innerHTML = '<a href="' + uri + '">0</a>';
+          return div.firstChild.href;
+        }
+
+      });
+    }
+  };
+});
+$__System.register("70", ["29", "6a", "6e", "1b", "1c", "f", "6f", "e"], function (_export) {
+  var Notifier, _get, _inherits, _createClass, _classCallCheck, utils, uriUtils, Logger, XHR;
 
   return {
-    setters: [function (_3) {
-      utils = _3["default"];
-    }, function (_4) {
-      uriUtils = _4["default"];
-    }, function (_) {
-      _inherits = _["default"];
-    }, function (_2) {
-      _get = _2["default"];
+    setters: [function (_) {
+      Notifier = _["default"];
+    }, function (_a) {
+      _get = _a["default"];
+    }, function (_e) {
+      _inherits = _e["default"];
     }, function (_b) {
       _createClass = _b["default"];
     }, function (_c) {
       _classCallCheck = _c["default"];
-    }, function (_a) {
-      Notifier = _a["default"];
-    }, function (_c2) {
-      Logger = _c2["default"];
+    }, function (_f) {
+      utils = _f["default"];
+    }, function (_f2) {
+      uriUtils = _f2["default"];
+    }, function (_e2) {
+      Logger = _e2["default"];
     }],
     execute: function () {
       "use strict";
 
       XHR = (function (_Notifier) {
+        _inherits(XHR, _Notifier);
+
         function XHR(method, url, data) {
           _classCallCheck(this, XHR);
 
@@ -8079,15 +8805,13 @@ $__System.register("1d", ["21", "25", "26", "27", "1b", "1c", "1a", "c"], functi
           this.init(method, url, data);
         }
 
-        _inherits(XHR, _Notifier);
-
         _createClass(XHR, [{
           key: "init",
           value: function init(method, url, data) {
 
             method = method.toUpperCase();
 
-            this.__xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+            this.__xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
             this.__method = ["POST", "GET"].indexOf(method) != -1 ? method : "GET";
             this.__data = data || null;
             this.__requestHeaders = {};
@@ -8260,8 +8984,6 @@ $__System.register("1d", ["21", "25", "26", "27", "1b", "1c", "1a", "c"], functi
             this.getXhr().abort();
             return this;
           }
-        }, {
-          key: "_serializeData",
 
           /**
            * Serializes data.
@@ -8270,6 +8992,8 @@ $__System.register("1d", ["21", "25", "26", "27", "1b", "1c", "1a", "c"], functi
            * @param contentType {String?} Content-Type which influences the serialisation.
            * @return {String|null} Serialized data.
            */
+        }, {
+          key: "_serializeData",
           value: function _serializeData(data, contentType) {
 
             var isPost = this.getMethod() === "POST";
@@ -8326,6 +9050,8 @@ $__System.register("1d", ["21", "25", "26", "27", "1b", "1c", "1a", "c"], functi
               try {
                 this._setResponse(this.__parse(response, contentType));
               } catch (e) {}
+              // ignore if it does not work
+
               // A remote error failure
               if (xhr.status !== 0) {
                 this.emit("fail", xhr);
@@ -8352,20 +9078,20 @@ $__System.register("1d", ["21", "25", "26", "27", "1b", "1c", "1a", "c"], functi
             if (/^application\/xml$/.test(contentTypeNormalized)) {
               try {
                 if (window.DOMParser) {
-                  response = new DOMParser().parseFromString(response, "text/xml");
+                  response = new DOMParser().parseFromString(response, 'text/xml');
                 }
                 // IE<9
                 else {
-                  response = new ActiveXObject("Microsoft.XMLDOM");
-                  response.async = "false";
-                  response.loadXML(response);
-                }
+                    response = new ActiveXObject('Microsoft.XMLDOM');
+                    response.async = 'false';
+                    response.loadXML(response);
+                  }
               } catch (e) {
                 response = undefined;
               }
 
-              if (!response || !response.documentElement || response.getElementsByTagName("parsererror").length) {
-                Logger.error("Invalid XML");
+              if (!response || !response.documentElement || response.getElementsByTagName('parsererror').length) {
+                Logger.error('Invalid XML');
               }
             }
           }
@@ -8415,570 +9141,205 @@ $__System.register("1d", ["21", "25", "26", "27", "1b", "1c", "1a", "c"], functi
     }
   };
 });
+$__System.register("71", ["65", "70", "5d"], function (_export) {
+	var _Object$assign, XHR, _Promise;
 
-// ignore if it does not work
-$__System.register("23", ["21", "22", "2b", "f", "c"], function (_export) {
-  var utils, eventHelpers, _Object$values, cssHelpers, Logger;
+	return {
+		setters: [function (_) {
+			_Object$assign = _["default"];
+		}, function (_2) {
+			XHR = _2["default"];
+		}, function (_d) {
+			_Promise = _d["default"];
+		}],
+		execute: function () {
+			"use strict";
 
+			_export("default", (function () {
+
+				/**
+    * *async*
+    * *user*
+    * *password*
+    * *headers*
+    * *timeout*
+    *
+    */
+
+				var defaultOptions = {
+					async: true,
+					timeout: 3000,
+					user: null,
+					password: "",
+					cache: false
+				};
+
+				var processRequest = function processRequest(xhr, options) {
+
+					options = options || {};
+					options.headers = options.headers || {};
+					options = _Object$assign(defaultOptions, options);
+
+					xhr.setAsync(options.async);
+					xhr.setCaching(options.cache);
+					xhr.setTimeout(options.timeout);
+
+					if (options.user !== null) {
+						xhr.setCredencials(options.user, options.password);
+					}
+
+					xhr.send();
+
+					return new _Promise(function (resolve, reject) {
+						xhr.on("success", function (e) {
+							resolve(e);
+						});
+						xhr.on("fail", function (e) {
+							reject(e);
+						});
+					});
+				};
+
+				var instance = null;
+
+				var getInstance = function getInstance(method, url, data) {
+					data = data || {};
+					if (instance === null) {
+						instance = new XHR(method, url, data);
+						instance.$$oid = "scope_" + new Date().getTime();
+					} else {
+						instance.setMethod(method);
+						instance.setUrl(url);
+						instance.setRequestData(data);
+					}
+					return instance;
+				};
+
+				return {
+
+					/**
+     * Send an http get request
+     * @param url {String} The request url
+     * @param data {Map} Map containing key/value pairs data to be sent
+     * @param options {Map} Map containing the request options.
+     *   
+     *
+     */
+					get: function get(url, data, options) {
+						return processRequest(getInstance("get", url, data), options);
+					},
+
+					post: function post(url, data, options) {
+						return processRequest(getInstance("post", url, data), options);
+					},
+
+					put: function put(url, data, options) {
+						return processRequest(getInstance("put", url, data), options);
+					},
+
+					"delete": function _delete(url, data, options) {
+						return processRequest(getInstance("delete", url, data), options);
+					}
+
+				};
+			})());
+		}
+	};
+});
+$__System.register("1", ["5", "6", "7", "8", "9", "16", "60", "71", "a", "5f", "e"], function (_export) {
+  /**
+   *  Browser support : IE9, Chrome , Firefox
+   *  @version 0.0.1
+   *  @author Romeo Kenfack Tsakem
+   */
+
+  // http://casperjs.org/
+  // https://github.com/Fyrd/caniuse
+
+  //TODO: Implements conditions as functions (data-show. data-hide, data-if)
+  //TODO: Fix ciclic references
+
+  "use strict";
+
+  var windowPolyfills, polyfill, dataset, customEvent, promise, Collection, Router, xhr, webanimation, Observable, Logger;
   return {
-    setters: [function (_2) {
-      utils = _2["default"];
-    }, function (_) {
-      eventHelpers = _["default"];
-    }, function (_b) {
-      _Object$values = _b["default"];
+    setters: [function (_) {
+      windowPolyfills = _["default"];
+    }, function (_2) {
+      polyfill = _2["default"];
+    }, function (_3) {
+      dataset = _3["default"];
+    }, function (_4) {
+      customEvent = _4["default"];
+    }, function (_5) {
+      promise = _5["default"];
+    }, function (_6) {
+      Collection = _6["default"];
+    }, function (_7) {
+      Router = _7["default"];
+    }, function (_8) {
+      xhr = _8["default"];
+    }, function (_a) {
+      webanimation = _a["default"];
     }, function (_f) {
-      cssHelpers = _f["default"];
-    }, function (_c) {
-      Logger = _c["default"];
+      Observable = _f["default"];
+    }, function (_e) {
+      Logger = _e["default"];
     }],
     execute: function () {
-      "use strict";
-
       _export("default", (function () {
 
-        var keyEventSpec = "keyboard";
-
-        (function () {
-          var evt = document.createEvent("KeyboardEvent");
-          keyEventSpec = evt.initKeyEvent ? "key" : "keyboard";
-        })();
-
-        var createTouch = function createTouch(target) {
-          return {
-            view: window,
-            target: target,
-            identifier: utils.getUID(),
-            pageX: 0,
-            pageY: 0,
-            screenX: 0,
-            screenY: 0
-          };
+        var scope = function scope(selector, ctx) {
+          return Collection.query(selector, ctx);
         };
 
-        var addDefaultTouches = function addDefaultTouches(target, eventName, properties) {
-          var touch = createTouch(target);
-          if (properties.touches.length === 0) {
-            properties.touches.push(touch);
-          }
-          if (properties.targetTouches.length === 0) {
-            properties.targetTouches.push(touch);
-          }
-          if (properties.changedTouches.length === 0) {
-            properties.changedTouches.push(touch);
-          }
-        };
-
-        var isMouseEvent = function isMouseEvent(eventName) {
-          return eventName == "click" || eventName == "dbclick" || eventName.indexOf("mouse") === 0;
-        };
-
-        var isTouchEvent = function isTouchEvent(eventName) {
-          return eventName.indexOf("touch") === 0;
-        };
-
-        var isPointerEvent = function isPointerEvent(eventName) {
-          return eventName.indexOf("pointer") === 0;
-        };
-
-        var isKeyBoardEvent = function isKeyBoardEvent(eventName) {
-          return eventName.indexOf("key") === 0;
-        };
-
-        var createUIEvent = function createUIEvent(eventName, properties) {
-          var evt = null;
-          properties = properties || {};
-          if (typeof UIEvent != "undefined") {
-            try {
-              evt = new UIEvent(eventName, properties);
-            } catch (err) {
-              Logger.info("UIEvent construnctor not supported on, document.createEvent used instead.");
+        for (var module in Collection) {
+          if (Collection.hasOwnProperty(module)) {
+            if (typeof Collection[module] == "function") {
+              scope[module] = Collection[module].bind(scope);
+            } else {
+              scope[module] = Collection[module];
             }
           }
-          if (evt === null) {
-            evt = document.createEvent("UIEvent");
-            evt.initUIEvent.apply(evt, [eventName].concat(_Object$values(properties)));
-          }
-          return evt;
+        }
+
+        scope.addModule = Collection.addModule;
+
+        scope.addStaticModule(xhr);
+
+        scope.addStaticModule({
+          Router: Router.Router,
+          Logger: Logger,
+          Observable: Observable
+        });
+
+        var _scope = scope;
+
+        scope.noConflict = function () {
+          return _scope;
         };
 
-        var createKeyBoardEvent = function createKeyBoardEvent(eventName, properties) {
-          var evt = null;
-          properties = properties || {};
-          if (typeof KeyboardEvent != "undefined") {
-            try {
-              evt = new KeyboardEvent(eventName, properties);
-            } catch (err) {
-              Logger.info("KeyboardEvent construnctor not supported on, document.createEvent used instead.");
-            }
-          }
-          if (evt === null) {
-            evt = document.createEvent("KeyboardEvent");
-            var init = evt.initKeyEvent || evt.initKeyboardEvent;
-            init.apply(evt, [eventName].concat(_Object$values(properties)));
-          }
-          return evt;
-        };
+        if (typeof window != "undefined") {
+          window.scope = window.$ = scope;
+        }
 
-        var createMouseEvent = function createMouseEvent(eventName, properties) {
-          var evt = null;
-          properties = properties || {};
-          if (typeof MouseEvent != "undefined") {
-            try {
-              evt = new MouseEvent(eventName, properties);
-            } catch (err) {
-              Logger.info("MouseEvent construnctor not supported on, document.createEvent used instead.");
-            }
-          }
-          if (evt === null) {
-            evt = document.createEvent("MouseEvent");
-            evt.initMouseEvent.apply(evt, [eventName].concat(_Object$values(properties)));
-          }
-          return evt;
-        };
-
-        var createTouchEvent = function createTouchEvent(target, eventName, properties) {
-          var evt = null;
-          properties = properties || {};
-          properties = addDefaultTouches(target, eventName, properties);
-
-          if (typeof TouchEvent != "undefined") {
-            try {
-              evt = new TouchEvent(eventName, properties);
-            } catch (err) {
-              Logger.info("TouchEvent construnctor not supported on, document.createEvent used instead.");
-            }
-          }
-
-          if (evt === null) {
-            evt = document.createEvent("TouchEvent");
-            evt.initTouchEvent.apply(evt, [eventName].concat(_Object$values(properties)));
-          }
-
-          return evt;
-        };
-
-        var createPointerEvent = function createPointerEvent(eventName, properties) {
-
-          var evt = null;
-          properties = properties || {};
-
-          if (typeof PointerEvent != "undefined") {
-            try {
-              evt = new PointerEvent(eventName, properties);
-            } catch (err) {
-              Logger.info("PointerEvent construnctor not supported on, document.createEvent used instead.");
-            }
-          }
-
-          if (evt === null) {
-            evt = document.createEvent("PointerEvent");
-            evt.initPointerEvent.apply(evt, [eventName].concat(_Object$values(properties)));
-          }
-
-          return evt;
-        };
-
-        var createEvent = function createEvent(item, eventName, properties) {
-          if (isMouseEvent(eventName)) {
-            return createMouseEvent(eventName, properties);
-          } else if (isTouchEvent(eventName)) {
-            return createTouchEvent(item, eventName, properties);
-          } else if (isPointerEvent(eventName)) {
-            return createPointerEvent(eventName, properties);
-          } else if (isKeyBoardEvent(eventName)) {
-            return createKeyBoardEvent(eventName, properties);
-          } else {
-            return createUIEvent(eventName, properties);
-          }
-        };
-
-        return {
-
-          emitNative: function emitNative(eventName, properties) {
-            properties = properties || {};
-            this.forEach(function (item) {
-              if (eventHelpers.isEventSupported(item, eventName)) {
-                var evt = createEvent(item, eventName, properties);
-                item.dispatchEvent(evt);
-              } else {
-                Logger.error(eventName + " not supported on " + item);
-              }
-            });
-            return this;
-          },
-
-          emitCustom: function emitCustom(eventName, data) {
-            data = data || {};
-            this.forEach(function (item) {
-              item.dispatchEvent(new CustomEvent(eventName, data));
-            });
-            return this;
-          }
-
-        };
+        return scope;
       })());
     }
   };
 });
-$__System.register("21", [], function (_export) {
-  "use strict";
-
-  return {
-    setters: [],
-    execute: function () {
-      _export("default", {
-
-        classToTypeMap: {
-          "[object String]": "String",
-          "[object Array]": "Array",
-          "[object Object]": "Object",
-          "[object RegExp]": "RegExp",
-          "[object Number]": "Number",
-          "[object Boolean]": "Boolean",
-          "[object Date]": "Date",
-          "[object Function]": "Function",
-          "[object Error]": "Error"
-        },
-
-        getType: function getType(value) {
-          return this.getClass(value);
-        },
-
-        getClass: function getClass(value) {
-          // The typeof null and undefined is "object" under IE8
-          if (value === undefined) {
-            return "Undefined";
-          } else if (value === null) {
-            return "Null";
-          }
-          var classString = Object.prototype.toString.call(value);
-          return this.classToTypeMap[classString] || classString.slice(8, -1);
-        },
-
-        getUID: function getUID() {
-          return (new Date().getTime() + "" + Math.floor(Math.random() * 1000000)).substr(0, 18);
-        },
-
-        isFunction: function isFunction(obj) {
-          return typeof obj === "function";
-        },
-
-        equals: function equals(object1, object2) {
-          return this.__equals(object1, object2, [], []);
-        },
-
-        isObject: function isObject(obj) {
-          return Object.prototype.toString.call(obj) == "[object Object]";
-        },
-
-        isDate: function isDate(obj) {
-          return Object.prototype.toString.call(obj) == "[object Date]";
-        },
-
-        camelCase: function camelCase(s) {
-          if (s.indexOf("-") != -1) {
-            return (s || "").toLowerCase().replace(/(-)\w/g, function (m) {
-              return m.toUpperCase().replace(/-/, "");
-            });
-          }
-          return s;
-        },
-
-        firstUp: function firstUp(str) {
-          return str.charAt(0).toUpperCase() + str.substr(1);
-        },
-
-        hyphenate: function hyphenate(str) {
-          return str.replace(/\s/g, "-").toLowerCase();
-        },
-
-        __equals: function __equals(object1, object2, aStack, bStack) {
-          // Identical objects are equal. `0 === -0`, but they aren't identical.
-          // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
-          if (object1 === object2) {
-            return object1 !== 0 || 1 / object1 == 1 / object2;
-          }
-          // A strict comparison is necessary because `null == undefined`.
-          if (object1 === null || object2 === null) {
-            return object1 === object2;
-          }
-          // Compare `[[Class]]` names.
-          var className = Object.prototype.toString.call(object1);
-          if (className != Object.prototype.toString.call(object2)) {
-            return false;
-          }
-          switch (className) {
-            // Strings, numbers, dates, and booleans are compared by value.
-            case "[object String]":
-              // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
-              // equivalent to `new String("5")`.
-              return object1 == String(object2);
-            case "[object Number]":
-              // `NaN`s are equivalent, but non-reflexive. An `egal` comparison is performed for
-              // other numeric values.
-              return object1 != +object1 ? object2 != +object2 : object1 === 0 ? 1 / object1 == 1 / object2 : object1 == +object2;
-            case "[object Date]":
-            case "[object Boolean]":
-              // Coerce dates and booleans to numeric primitive values. Dates are compared by their
-              // millisecond representations. Note that invalid dates with millisecond representations
-              // of `NaN` are not equivalent.
-              return +object1 == +object2;
-            // RegExps are compared by their source patterns and flags.
-            case "[object RegExp]":
-              return object1.source == object2.source && object1.global == object2.global && object1.multiline == object2.multiline && object1.ignoreCase == object2.ignoreCase;
-          }
-          if (typeof object1 != "object" || typeof object2 != "object") {
-            return false;
-          }
-          // Assume equality for cyclic structures. The algorithm for detecting cyclic
-          // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
-          var length = aStack.length;
-          while (length--) {
-            // Linear search. Performance is inversely proportional to the number of
-            // unique nested structures.
-            if (aStack[length] == object1) {
-              return bStack[length] == object2;
-            }
-          }
-          // Objects with different constructors are not equivalent, but `Object`s
-          // from different frames are.
-          var aCtor = object1.constructor,
-              bCtor = object2.constructor;
-          if (aCtor !== bCtor && !(this.isFunction(aCtor) && aCtor instanceof aCtor && this.isFunction(bCtor) && bCtor instanceof bCtor) && ("constructor" in object1 && "constructor" in object2)) {
-            return false;
-          }
-          // Add the first object to the stack of traversed objects.
-          aStack.push(object1);
-          bStack.push(object2);
-          var size = 0,
-              result = true;
-          // Recursively compare objects and arrays.
-          if (className == "[object Array]") {
-            // Compare array lengths to determine if a deep comparison is necessary.
-            size = object1.length;
-            result = size == object2.length;
-            if (result) {
-              // Deep compare the contents, ignoring non-numeric properties.
-              while (size--) {
-                if (!(result = this.__equals(object1[size], object2[size], aStack, bStack))) {
-                  break;
-                }
-              }
-            }
-          } else {
-            // Deep compare objects.
-            for (var key in object1) {
-              if (Object.prototype.hasOwnProperty.call(object1, key)) {
-                // Count the expected number of properties.
-                size++;
-                // Deep compare each member.
-                if (!(result = Object.prototype.hasOwnProperty.call(object2, key) && this.__equals(object1[key], object2[key], aStack, bStack))) {
-                  break;
-                }
-              }
-            }
-            // Ensure that both objects contain the same number of properties.
-            if (result) {
-              for (key in object2) {
-                if (Object.prototype.hasOwnProperty.call(object2, key) && ! size--) {
-                  break;
-                }
-              }
-              result = !size;
-            }
-          }
-          // Remove the first object from the stack of traversed objects.
-          aStack.pop();
-          bStack.pop();
-
-          return result;
-        }
-
-      });
-    }
-  };
+$__System.registerDynamic("4", [], false, function(__require, __exports, __module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
+  (function() {
+    (function() {
+      if (scope && scope.Logger) {
+        scope.Logger.enableAll();
+      }
+    })();
+  })();
+  return _retrieveGlobal();
 });
-$__System.register("22", [], function (_export) {
-  "use strict";
 
-  return {
-    setters: [],
-    execute: function () {
-      _export("default", {
-
-        isEventSupported: function isEventSupported(target, eventName) {
-          eventName = "on" + eventName;
-          var isSupported = (eventName in target);
-          if (!isSupported) {
-            target.setAttribute(eventName, "return;");
-            isSupported = typeof target[eventName] == "function";
-            target.removeAttribute(eventName);
-          }
-          return isSupported;
-        }
-
-      });
-    }
-  };
-});
-$__System.register("25", ["21", "c"], function (_export) {
-  "use strict";
-
-  var utils, Logger;
-  return {
-    setters: [function (_) {
-      utils = _["default"];
-    }, function (_c) {
-      Logger = _c["default"];
-    }],
-    execute: function () {
-      _export("default", {
-
-        /**
-         * Split URL
-         *
-         * Code taken from:
-         *   parseUri 1.2.2
-         *   (c) Steven Levithan <stevenlevithan.com>
-         *   MIT License
-         *
-         *
-         * @param str {String} String to parse as URI
-         * @param strict {Boolean} Whether to parse strictly by the rules
-         * @return {Object} Map with parts of URI as properties
-         */
-        parseUri: function parseUri(str, strict) {
-
-          var options = {
-            key: ["source", "protocol", "authority", "userInfo", "user", "password", "host", "port", "relative", "path", "directory", "file", "query", "anchor"],
-            q: {
-              name: "queryKey",
-              parser: /(?:^|&)([^&=]*)=?([^&]*)/g
-            },
-            parser: {
-              strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
-              loose: /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
-            }
-          };
-
-          var o = options,
-              m = options.parser[strict ? "strict" : "loose"].exec(str),
-              uri = {},
-              i = 14;
-
-          while (i--) {
-            uri[o.key[i]] = m[i] || "";
-          }
-          uri[o.q.name] = {};
-          uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
-            if ($1) {
-              uri[o.q.name][$1] = $2;
-            }
-          });
-
-          return uri;
-        },
-
-        /**
-         * Append string to query part of URL. Respects existing query.
-         *
-         * @param url {String} URL to append string to.
-         * @param params {String} Parameters to append to URL.
-         * @return {String} URL with string appended in query part.
-         */
-        appendParamsToUrl: function appendParamsToUrl(url, params) {
-
-          if (params === undefined) {
-            return url;
-          }
-
-          var paramType = utils.getType(params);
-
-          if (!(paramType == "String" || paramType == "Object")) {
-            Logger.error("params must be either string or object");
-          }
-
-          if (paramType == "Object") {
-            params = this.toParameter(params);
-          }
-
-          if (!params) {
-            return url;
-          }
-
-          return url += /\?/.test(url) ? "&" + params : "?" + params;
-        },
-
-        /**
-         * Serializes an object to URI parameters (also known as query string).
-         *
-         * Escapes characters that have a special meaning in URIs as well as
-         * umlauts. Uses the global function encodeURIComponent, see
-         * https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/encodeURIComponent
-         *
-         * Note: For URI parameters that are to be sent as
-         * application/x-www-form-urlencoded (POST), spaces should be encoded
-         * with "+".
-         *
-         * @param obj {Object}   Object to serialize.
-         * @param post {Boolean} Whether spaces should be encoded with "+".
-         * @return {String}      Serialized object. Safe to append to URIs or send as
-         *                       URL encoded string.
-         */
-        toParameter: function toParameter(obj, post) {
-          var key,
-              parts = [];
-
-          for (key in obj) {
-            if (obj.hasOwnProperty(key)) {
-              var value = obj[key];
-              if (value instanceof Array) {
-                for (var i = 0; i < value.length; i++) {
-                  this.__toParameterPair(key, value[i], parts, post);
-                }
-              } else {
-                this.__toParameterPair(key, value, parts, post);
-              }
-            }
-          }
-
-          return parts.join("&");
-        },
-
-        /**
-         * Encodes key/value to URI safe string and pushes to given array.
-         *
-         * @param key {String} Key.
-         * @param value {String} Value.
-         * @param parts {Array} Array to push to.
-         * @param post {Boolean} Whether spaces should be encoded with "+".
-         */
-        __toParameterPair: function __toParameterPair(key, value, parts, post) {
-          var encode = window.encodeURIComponent;
-          if (post) {
-            parts.push(encode(key).replace(/%20/g, "+") + "=" + encode(value).replace(/%20/g, "+"));
-          } else {
-            parts.push(encode(key) + "=" + encode(value));
-          }
-        },
-
-        /**
-         * Takes a relative URI and returns an absolute one.
-         *
-         * @param uri {String} relative URI
-         * @return {String} absolute URI
-         */
-        getAbsolute: function getAbsolute(uri) {
-          var div = document.createElement("div");
-          div.innerHTML = "<a href=\"" + uri + "\">0</a>";
-          return div.firstChild.href;
-        }
-
-      });
-    }
-  };
-});
 })
 (function(factory) {
   factory();
